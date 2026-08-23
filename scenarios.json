@@ -1,0 +1,550 @@
+{
+  "scenarios": [
+    {
+      "name": "link sign-ups are readable by everyone and writable by nobody",
+      "members": {
+        "host": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('tr1', ?, ?, '', '', '', '2026-03-01', '2026-03-04', 'open', ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Meals for the Alvarez family",
+            "Dana & Miguel",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('d1', 'tr1', '2026-03-01', ?, ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Sun, Mar 1",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, guest_note, created_at) VALUES ('g1', 'tr1', 'd1', 'Marta', 'Lasagna', 'Drop at 5:30', '2026-02-21 17:04:00'), ('g2', 'tr1', 'd1', 'Ken', 'Chili', '', '2026-02-22 09:00:00')"
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, guest_name, bringing FROM app_meal_train__guest_claims WHERE train_id = ?",
+          "params": [
+            "tr1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [
+              {
+                "guest_name": "Marta",
+                "bringing": "Lasagna"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "DELETE FROM app_meal_train__guest_claims WHERE id = ?",
+          "params": [
+            "g1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__guest_claims SET bringing = ? WHERE id = ?",
+          "params": [
+            "Edited",
+            "g1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, guest_note, created_at) VALUES (?, 'tr1', 'd1', ?, '', '', '2026-02-23 09:00:00')",
+          "params": [
+            "g3",
+            "Forged"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id FROM app_meal_train__guest_claims WHERE train_id = ?",
+          "params": [
+            "tr1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "only adults lay out nights or tune the link allowance",
+      "members": {
+        "host": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('tr1', ?, '', '', '', '', '2026-03-01', '2026-03-04', 'open', ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Recovery meals",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('d1', 'tr1', '2026-03-01', ?, ?, '', 2, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Sun, Mar 1",
+            "Recovery meals"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "UPDATE app_meal_train__dates SET capacity = 9 WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('d-kid', 'tr1', '2026-03-02', ?, ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Mon, Mar 2",
+            "Recovery meals"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, capacity FROM app_meal_train__dates WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 2
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__dates SET capacity = 0 WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, capacity, status FROM app_meal_train__dates WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 0,
+                "status": "open"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "a member taking a night closes the same door the public form reads",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('tr1', ?, '', '', '', '', '2026-03-01', '2026-03-02', 'open', ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "New baby meals",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('d1', 'tr1', '2026-03-01', ?, ?, '', 1, 'open', '', '2026-02-20T00:00:00Z'), ('d2', 'tr1', '2026-03-02', ?, ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Sun, Mar 1",
+            "New baby meals",
+            "Mon, Mar 2",
+            "New baby meals"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__dates SET status = 'covered', covered_by = ?, covered_dish = ?, covered_at = '2026-02-21T00:00:00Z' WHERE id = ?",
+          "params": [
+            "{{host}}",
+            "Chicken and rice",
+            "d1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, status, covered_by, covered_dish FROM app_meal_train__dates WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "status": "covered",
+                "covered_dish": "Chicken and rice"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_meal_train__dates WHERE train_id = ? AND status = 'open'",
+          "params": [
+            "tr1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "id": "d2"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__dates SET status = 'open', covered_by = NULL, covered_dish = '', covered_at = NULL WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_meal_train__dates WHERE train_id = ? AND status = 'open'",
+          "params": [
+            "tr1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "an automation-opened train is adult-owned by nobody and has no nights yet",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at, source_event_id) VALUES ('tr-auto', ?, '', '', '', '', '2026-03-01', '', 'open', 'automation', 'Automation', '2026-02-20T00:00:00Z', 'ev-src-1')",
+          "params": [
+            "Surgery recovery"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, created_by, status FROM app_meal_train__trains WHERE id = ?",
+          "params": [
+            "tr-auto"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "created_by": "automation",
+                "status": "open"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_meal_train__dates WHERE train_id = ?",
+          "params": [
+            "tr-auto"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 0
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('d1', 'tr-auto', '2026-03-01', ?, ?, '', 1, 'open', '', '2026-02-21T00:00:00Z')",
+          "params": [
+            "Sun, Mar 1",
+            "Surgery recovery"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, capacity FROM app_meal_train__dates WHERE train_id = ? AND status = 'open'",
+          "params": [
+            "tr-auto"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Today and the home tile drop closed trains while the tile also drops guest-full nights",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES (?, ?, '', '', '', '', '2026-03-01', '2026-03-01', ?, ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "tr-open",
+            "Meals for the Alvarez family",
+            "open",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES (?, ?, '', '', '', '', '2026-03-01', '2026-03-01', ?, ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "tr-shut",
+            "Meals after the surgery",
+            "closed",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES (?, ?, '2026-03-01', 'Sun, Mar 1', ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "d-open",
+            "tr-open",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES (?, ?, '2026-03-01', 'Sun, Mar 1', ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "d-shut",
+            "tr-shut",
+            "Meals after the surgery"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES (?, ?, '2026-03-02', 'Mon, Mar 2', ?, '', 1, 'open', '', '2026-02-20T00:00:00Z')",
+          "params": [
+            "d-needed",
+            "tr-open",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, guest_note, created_at) VALUES ('g-full', 'tr-open', 'd-open', 'Marta', 'Lasagna', '', '2026-02-21 17:04:00')"
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT d.id AS id, d.train_title AS title, d.meal_date AS when_at, NULLIF(d.note, '') AS subtitle, d.covered_by AS member_id FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' WHERE d.meal_date = '2026-03-01' AND d.status != 'closed' ORDER BY d.created_at LIMIT 10",
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "id": "d-open",
+                "title": "Meals for the Alvarez family"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT d.train_title AS title, NULLIF(d.note, '') AS subtitle, d.meal_date AS at FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' WHERE d.status = 'open' AND d.meal_date >= '2026-03-01' AND NOT (COALESCE(d.capacity, 0) > 0 AND (SELECT COUNT(*) FROM app_meal_train__guest_claims g WHERE g.train_id = d.train_id AND g.date_id = d.id) >= COALESCE(d.capacity, 0)) ORDER BY d.meal_date LIMIT 3",
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "title": "Meals for the Alvarez family",
+                "at": "2026-03-02"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_meal_train__dates WHERE meal_date = '2026-03-01'",
+          "expect": {
+            "status": 200,
+            "rowCount": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "closing a night gives up the member claim on it, and reopening leaves nobody holding it",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES (?, ?, '', '', '', '', '2026-03-01', '2026-03-01', ?, ?, 'Host', '2026-02-20T00:00:00Z')",
+          "params": [
+            "tr1",
+            "Meals for the Alvarez family",
+            "open",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_by, covered_dish, covered_at, created_at) VALUES ('d1', 'tr1', '2026-03-01', 'Sun, Mar 1', ?, '', 1, 'covered', ?, ?, '2026-02-21T00:00:00Z', '2026-02-20T00:00:00Z')",
+          "params": [
+            "Meals for the Alvarez family",
+            "{{host}}",
+            "Chicken and rice"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__dates SET status = ?, covered_by = NULL, covered_dish = '', covered_at = NULL WHERE id = ?",
+          "params": [
+            "closed",
+            "d1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, status, covered_by, covered_dish FROM app_meal_train__dates WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "status": "closed",
+                "covered_by": null,
+                "covered_dish": ""
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_meal_train__dates SET status = ?, covered_by = NULL, covered_dish = '', covered_at = NULL WHERE id = ?",
+          "params": [
+            "open",
+            "d1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, status, covered_by FROM app_meal_train__dates WHERE id = ?",
+          "params": [
+            "d1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "status": "open",
+                "covered_by": null
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

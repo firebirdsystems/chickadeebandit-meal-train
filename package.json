@@ -1,0 +1,16 @@
+{
+  "name": "chickadeebandit-meal-train",
+  "version": "1.0.0",
+  "description": "Meal train coordination for Chickadee Bandit — share one link and let neighbours claim a night",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node dev.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

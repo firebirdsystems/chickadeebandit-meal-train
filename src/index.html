@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meal Train</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--hub-bg, #f9fafb);
+      --surface: var(--hub-surface, #ffffff);
+      --border: var(--hub-border, #e5e7eb);
+      --border-mid: var(--hub-border, #d1d5db);
+      --text: var(--hub-text, #000000);
+      --muted: var(--hub-text-muted, #6b7280);
+      --accent: var(--hub-primary, #111827);
+      --accent-hover: var(--hub-primary-hover, #374151);
+      --accent-fg: var(--hub-primary-fg, #ffffff);
+      --radius: var(--hub-radius, 8px);
+      --green: #047857; --green-soft: #d1fae5;
+      --amber: #b45309; --amber-soft: #fef3c7;
+      --red: #b91c1c; --red-soft: #fee2e2;
+      --blue-soft: #dbeafe;
+      --shadow: 0 1px 3px rgba(15, 23, 42, .07);
+    }
+    body {
+      min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      font-size: var(--hub-font-size, 15px); line-height: 1.5;
+    }
+    .app { max-width: 820px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    h1 { font-size: 1.35rem; line-height: 1.2; }
+    h2 { font-size: 1rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); }
+    .tiny { font-size: .78rem; }
+    .stack { display: grid; gap: 12px; }
+    .grid { display: grid; gap: 12px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px;
+    }
+    .train-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+    .train-card:hover { border-color: var(--border-mid); box-shadow: 0 5px 14px rgba(15, 23, 42, .08); }
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .title { font-weight: 750; font-size: 1rem; }
+    .meta { margin-top: 3px; color: var(--muted); font-size: .82rem; }
+    .progress { height: 8px; overflow: hidden; border-radius: 999px; background: #eef2f7; margin-top: 10px; }
+    .progress > span { display: block; height: 100%; background: var(--green); border-radius: 999px; }
+    .pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 24px; padding: 2px 8px; border-radius: 999px;
+      background: #f1f5f9; color: var(--muted); font-size: .74rem; font-weight: 700; white-space: nowrap;
+    }
+    .pill.good { background: var(--green-soft); color: var(--green); }
+    .pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .pill.info { background: var(--blue-soft); color: #1d4ed8; }
+    .tabs { display: flex; gap: 4px; background: var(--border); padding: 3px; border-radius: 10px; margin-bottom: 14px; }
+    .tab { flex: 1; border: 0; border-radius: 8px; background: transparent; color: var(--muted); padding: 7px; font-weight: 700; cursor: pointer; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 2px 10px; }
+    .section-head h2 { margin-bottom: 0; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid transparent; border-radius: 8px; padding: 8px 12px;
+      font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer;
+      min-height: 38px; background: var(--accent); color: var(--accent-fg);
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: .48; cursor: default; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-mid); }
+    .btn-ghost:hover { background: #f8fafc; }
+    .btn-danger { background: var(--red-soft); color: var(--red); border-color: transparent; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-quiet-danger { min-height: 28px; padding: 3px 6px; background: transparent; color: var(--muted); border: 0; font-size: .76rem; font-weight: 700; }
+    .btn-quiet-danger:hover { background: var(--red-soft); color: var(--red); }
+    .btn-sm { min-height: 31px; padding: 5px 9px; font-size: .78rem; }
+    .back { margin-bottom: 10px; }
+    .day { display: grid; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border); }
+    .day:first-child { border-top: 0; padding-top: 0; }
+    .day-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .day-name { font-weight: 750; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px 3px 4px; font-size: .78rem; }
+    .day-guests { display: grid; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: #f8fafc; border: 1px dashed var(--border-mid); }
+    .day-guest-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .day-guest-cap { display: flex; align-items: center; gap: 6px; }
+    .day-guest-cap input { width: 64px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: .78rem; }
+    .share-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .share-url { width: 100%; font-size: .8rem; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+    .share-opt { display: flex; gap: 6px; align-items: center; font-size: .85rem; margin-top: 10px; }
+    #share-password { width: 100%; margin-top: 8px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: .85rem; }
+    .share-create { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
+    .share-create select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: .85rem; }
+    .warn-box { background: var(--amber-soft); color: var(--amber); padding: 8px 10px; border-radius: 8px; font-size: .82rem; margin: 8px 0; }
+    .avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: .72rem; font-weight: 800; background: #0f766e; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .form { display: grid; gap: 10px; }
+    .field { display: grid; gap: 4px; }
+    label { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+    input, textarea, select {
+      width: 100%; border: 1.5px solid var(--border-mid); border-radius: 8px;
+      padding: 9px 11px; font: inherit; background: var(--surface); color: var(--text);
+    }
+    textarea { min-height: 66px; resize: vertical; }
+    input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+    .add-day { display: grid; grid-template-columns: 150px 1fr 84px auto; gap: 8px; align-items: end; margin-top: 12px; }
+    .add-day .field label { font-size: .7rem; }
+    .empty, .loading { color: var(--muted); text-align: center; padding: 32px 16px; }
+    .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .notice { background: var(--green-soft); color: var(--green); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    @media (min-width: 700px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) {
+      .topbar, .head, .day-top { align-items: stretch; flex-direction: column; }
+      .add-day { grid-template-columns: 1fr; }
+      .actions .btn { flex: 1; }
+    }
+    .search-row { margin-bottom: 12px; }
+    .search-input {
+      width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
+      border-radius: 8px; padding: 9px 11px; font: inherit;
+      background: var(--surface, #fff); color: var(--text, inherit);
+    }
+    .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
+  </style>
+  <base href="/run/meal-train/">
+</head>
+<body>
+<div class="app"><div id="root" class="loading">Loading…</div></div>
+
+<script type="module">
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper } from "/hub-sdk.js";
+import {
+  canManage as _canManage, resolveCurrentMember, dateLabel, datesInRange, normalizeTimestamp,
+  guestClaimsForDate, isDateGuestFull, acceptsLinkSignups, parseCapacity,
+  dateState, isOrphanedCoverage,
+  toggledClosedFields, datesForTrain, openDatesForForm, trainTotals as _trainTotals, searchableFields,
+} from "./logic.js";
+
+const CONTEXT    = window.__CONTEXT_URL    ?? "";
+const DB         = window.__DB_URL         ?? "";
+const EVENTS_URL = window.__EVENTS_URL     ?? "/api/events";
+const APP_ID     = window.__APP_ID         ?? "meal-train";
+const ME         = window.__CURRENT_MEMBER ?? null;
+
+// Share links. `enabled` is false unless the hub injected the URLs, which it
+// only does for a manifest declaring `shareable` — so every share control is
+// gated on it rather than on the app assuming the surface exists.
+const share = createShareHelper(window.__SHARE_CREATE_URL, window.__SHARE_REVOKE_URL, window.__SHARE_LIST_URL);
+
+let members = [];
+let memberMap = new Map();
+let currentMember = null;
+let trains = [];
+let dates = [];
+let guestClaims = [];      // share-link sign-ups (endpoint_only: read-only in here)
+let selectedTrainId = null;
+let view = "active";       // "active" | "closed" | "create"
+let editingTrainId = null;
+let searchQ = "";
+let error = "";
+let notice = "";
+
+// ── thin wrappers binding pure logic to app state ──
+function canManage() { return _canManage(currentMember); }
+function trainTotals(trainId) { return _trainTotals(trainId, dates, guestClaims); }
+function trainDates(trainId) { return datesForTrain(dates, trainId); }
+function guestsFor(dateId) { return guestClaimsForDate(guestClaims, dateId); }
+function openForForm(trainId) { return openDatesForForm(dates, guestClaims, trainId); }
+
+const nowIso = () => new Date().toISOString();
+const uid = (p) => `${p}-${crypto.randomUUID()}`;
+// The device's own calendar date, built from LOCAL getters — never
+// toISOString(), which is UTC and shifts the day for half of every day.
+function today() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function memberName(id) { return memberMap.get(id)?.name ?? "Member"; }
+function fmtStamp(v) {
+  const d = new Date(normalizeTimestamp(v));
+  if (isNaN(d)) return "";
+  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(d);
+}
+function selectedTrain() { return trains.find(t => t.id === selectedTrainId) ?? null; }
+
+async function dbq(sql, params = []) {
+  if (!DB) return { rows: [] };
+  return dbRequest({ sql, params });
+}
+async function dbBatch(statements) {
+  if (!DB) return { results: [] };
+  return dbRequest({ statements });
+}
+async function dbRequest(body) {
+  const res = await fetch(DB, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+function publish(type, subject_id, payload) {
+  fetch(EVENTS_URL, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source_app_id: APP_ID, type, subject_id, payload }),
+  }).catch(() => {});
+}
+
+// ── data ──
+async function loadMembers() {
+  if (!CONTEXT) {
+    members = [
+      { id: "demo-1", name: "Alex", role: "adult" },
+      { id: "demo-2", name: "Jordan", role: "adult" },
+      { id: "demo-3", name: "Casey", role: "child" },
+    ];
+  } else {
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members`);
+      members = ((await res.json())["family.members"]) ?? [];
+    } catch { members = []; }
+  }
+  memberMap = new Map(members.map(m => [m.id, m]));
+  currentMember = resolveCurrentMember(ME, members, !CONTEXT);
+}
+
+function seedDemo() {
+  const trainId = "demo-train";
+  trains = [{
+    id: trainId, title: "Meals for the Alvarez family", recipient: "Dana & Miguel Alvarez",
+    description: "Baby Rosa arrived a week early. Dinners for the first two weeks.",
+    delivery_notes: "Cooler on the porch — please don't ring the bell, the baby naps at 5.",
+    dietary_notes: "No dairy for Dana. Miguel eats anything.",
+    start_date: today(), end_date: today(), status: "open",
+    created_by: "demo-1", created_by_name: "Alex", created_at: nowIso(),
+  }];
+  const days = datesInRange(today(), today()).concat(["2026-03-04", "2026-03-05"]);
+  dates = days.map((d, i) => ({
+    id: `demo-date-${i}`, train_id: trainId, meal_date: d, label: dateLabel(d),
+    train_title: trains[0].title, note: i === 0 ? "Dinner for 4, they eat around 6" : "",
+    capacity: 1, status: i === 2 ? "covered" : "open",
+    covered_by: i === 2 ? "demo-2" : null, covered_dish: i === 2 ? "Chicken and rice" : "",
+    covered_at: i === 2 ? nowIso() : null, created_at: nowIso(),
+  }));
+  guestClaims = [
+    { id: "g-1", train_id: trainId, date_id: "demo-date-1", guest_name: "Marta from next door",
+      bringing: "Lasagna + salad", guest_note: "Will drop it at 5:30", created_at: "2026-03-01 17:04:00" },
+  ];
+}
+
+async function loadData() {
+  if (!DB) { seedDemo(); return; }
+  const [trainRows, dateRows, guestRows] = await Promise.all([
+    dbq("SELECT * FROM app_meal_train__trains ORDER BY start_date ASC, created_at ASC"),
+    dbq("SELECT * FROM app_meal_train__dates ORDER BY meal_date ASC, created_at ASC"),
+    // Same order the public feed renders in (manifest shareable.train.feed,
+    // order_column created_at / oldest), so the two views agree.
+    dbq("SELECT * FROM app_meal_train__guest_claims ORDER BY created_at ASC"),
+  ]);
+  trains = trainRows.rows;
+  dates = dateRows.rows;
+  guestClaims = guestRows.rows;
+}
+
+// `deepLink` is honoured on the FIRST load only. Re-applying ?trainId on every
+// refresh would drag the organizer back into that train's detail view every
+// time they pressed Refresh after backing out of it.
+async function refresh({ deepLink = false } = {}) {
+  clearMessages();
+  try {
+    await Promise.all([loadMembers(), loadData()]);
+    if (selectedTrainId && !trains.some(t => t.id === selectedTrainId)) selectedTrainId = null;
+    if (deepLink) handleDeepLink();
+    render();
+  } catch (e) { error = e.message; render(); }
+}
+function handleDeepLink() {
+  const trainId = new URLSearchParams(window.location.search).get("trainId");
+  if (trainId && trains.some(t => t.id === trainId)) selectedTrainId = trainId;
+}
+
+function clearMessages() { error = ""; notice = ""; }
+function showError(m) { error = m; notice = ""; render(); }
+function showNotice(m) { notice = m; error = ""; render(); }
+
+// ── mutations ──
+async function saveTrain(form) {
+  if (!canManage()) return showError("Only adults can open a meal train.");
+  const f = (name) => (form[name]?.value ?? "").trim();
+  const title = f("title");
+  if (!title) { form.title.focus(); return; }
+  const fields = {
+    title,
+    recipient: f("recipient"),
+    description: f("description"),
+    dietary_notes: f("dietary_notes"),
+    delivery_notes: f("delivery_notes"),
+    start_date: form.start_date.value || "",
+    end_date: form.end_date.value || "",
+  };
+
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+
+  try {
+    if (editingTrainId) {
+      await updateTrain(editingTrainId, fields);
+    } else {
+      await createTrain(fields, form.fill_range.checked);
+    }
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = editingTrainId ? "Save changes" : "Open meal train"; }
+    showError(e.message);
+  }
+}
+
+async function createTrain(fields, fillRange) {
+  const train = {
+    id: uid("train"), ...fields, status: "open",
+    created_by: currentMember.id, created_by_name: currentMember.name, created_at: nowIso(),
+  };
+  // Laying the whole care period out at once is the point of the app: nobody
+  // wants to add fourteen rows by hand. Bounded inside datesInRange().
+  const days = fillRange ? datesInRange(fields.start_date, fields.end_date) : [];
+  const newDates = days.map(d => newDateRow(train, d, ""));
+
+  if (DB) {
+    const statements = [{
+      sql: `INSERT INTO app_meal_train__trains
+         (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ?)`,
+      params: [train.id, train.title, train.recipient, train.description, train.dietary_notes,
+       train.delivery_notes, train.start_date, train.end_date, train.created_by,
+       train.created_by_name, train.created_at],
+    }];
+    // Keep each statement comfortably below SQLite's bind ceiling while the
+    // whole parent + child write remains one D1 transaction (7 statements at
+    // the maximum 60-night range, below the endpoint's limit of 25).
+    for (let i = 0; i < newDates.length; i += 10) {
+      statements.push(dateInsertStatement(newDates.slice(i, i + 10)));
+    }
+    await dbBatch(statements);
+  }
+  trains = [...trains, train];
+  dates = [...dates, ...newDates];
+  selectedTrainId = train.id;
+  view = "active";
+  editingTrainId = null;
+  showNotice(newDates.length ? `Meal train opened with ${newDates.length} night${newDates.length === 1 ? "" : "s"}.` : "Meal train opened. Add the nights that need a meal.");
+  publish("meal_train.train_opened", train.id, { title: train.title });
+  sendHubNotification({
+    title: "New meal train",
+    body: `${train.title} — sign up for a night.`,
+    url: hubAppUrl(APP_ID, { trainId: train.id }),
+  }).catch(() => {});
+}
+
+/**
+ * Editing a train re-stamps `train_title` on every one of its dates in the same
+ * call. That column is denormalized so the Today agenda and the glance tile —
+ * single-table SELECTs that cannot join back to `trains` — have a title to
+ * show; letting it drift would leave Today naming a train that no longer
+ * exists under that name.
+ */
+async function updateTrain(trainId, fields) {
+  if (DB) {
+    await dbBatch([
+      {
+        sql: `UPDATE app_meal_train__trains
+          SET title = ?, recipient = ?, description = ?, dietary_notes = ?, delivery_notes = ?, start_date = ?, end_date = ?
+        WHERE id = ?`,
+        params: [fields.title, fields.recipient, fields.description, fields.dietary_notes,
+          fields.delivery_notes, fields.start_date, fields.end_date, trainId],
+      },
+      {
+        sql: "UPDATE app_meal_train__dates SET train_title = ? WHERE train_id = ?",
+        params: [fields.title, trainId],
+      },
+    ]);
+  }
+  const i = trains.findIndex(t => t.id === trainId);
+  if (i !== -1) trains[i] = { ...trains[i], ...fields };
+  dates = dates.map(d => (d.train_id === trainId ? { ...d, train_title: fields.title } : d));
+  editingTrainId = null;
+  selectedTrainId = trainId;
+  view = "active";
+  showNotice("Meal train updated.");
+}
+
+// One place builds a date row, so `label` and `train_title` can never be
+// written without the columns they mirror.
+function newDateRow(train, mealDate, note, capacity = 1) {
+  return {
+    id: uid("date"), train_id: train.id, meal_date: mealDate,
+    label: dateLabel(mealDate), train_title: train.title, note,
+    capacity: parseCapacity(capacity, 1),
+    status: "open", covered_by: null, covered_dish: "", covered_at: null,
+    created_at: nowIso(),
+  };
+}
+async function insertDateRow(d) {
+  const statement = dateInsertStatement([d]);
+  await dbq(statement.sql, statement.params);
+}
+function dateInsertStatement(rows) {
+  const values = rows.map(() => "(?, ?, ?, ?, ?, ?, ?, 'open', '', ?)").join(", ");
+  return {
+    sql: `INSERT INTO app_meal_train__dates
+       (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at)
+     VALUES ${values}`,
+    params: rows.flatMap(d => [
+      d.id, d.train_id, d.meal_date, d.label, d.train_title, d.note, d.capacity, d.created_at,
+    ]),
+  };
+}
+
+async function addDate(form) {
+  if (!canManage()) return showError("Only adults can add nights.");
+  const train = selectedTrain();
+  if (!train) return;
+  const mealDate = form.meal_date.value;
+  if (!mealDate) { form.meal_date.focus(); return; }
+  const row = newDateRow(train, mealDate, form.note.value.trim(), form.capacity.value);
+  try {
+    if (DB) await insertDateRow(row);
+    dates = [...dates, row];
+    form.reset();
+    form.capacity.value = "1";
+    showNotice(`Added ${row.label}.`);
+  } catch (e) { showError(e.message); }
+}
+
+async function removeDate(dateId) {
+  if (!canManage()) return showError("Only adults can remove nights.");
+  const date = dates.find(d => d.id === dateId);
+  if (!date) return;
+  const signups = guestsFor(dateId).length;
+  const ok = await hubConfirm({
+    message: `Remove ${date.label}?`,
+    // Removing the date takes its link sign-ups with it (manifest
+    // delete_cascades), which is the honest behavior — but it destroys a real
+    // person's commitment, so say so before it happens rather than after.
+    description: signups
+      ? `${signups} ${signups === 1 ? "person has" : "people have"} already claimed this night through the shared link. Removing it removes their sign-up too.`
+      : "Nobody has claimed this night yet.",
+    confirmLabel: "Remove",
+    destructive: true,
+  });
+  if (!ok) return;
+  try {
+    if (DB) await dbq("DELETE FROM app_meal_train__dates WHERE id = ?", [dateId]);
+    dates = dates.filter(d => d.id !== dateId);
+    guestClaims = guestClaims.filter(g => g.date_id !== dateId);
+    showNotice("Night removed.");
+  } catch (e) { showError(e.message); }
+}
+
+// A member taking a night. There is deliberately no second claims ledger: one
+// date holds one meal, so a member claim CLOSES the date (status 'covered'),
+// which is also what drops it out of the public form's options — the member
+// door and the link door shut together.
+async function coverDate(dateId, dish) {
+  if (!canManage()) return showError("Only adults can sign up for a night.");
+  const date = dates.find(d => d.id === dateId);
+  if (!date) return false;
+  const at = nowIso();
+  try {
+    if (DB) {
+      const result = await dbq(
+        `UPDATE app_meal_train__dates
+            SET status = 'covered', covered_by = ?, covered_dish = ?, covered_at = ?
+          WHERE id = ? AND status = 'open'
+            AND NOT EXISTS (
+              SELECT 1 FROM app_meal_train__guest_claims g
+               WHERE g.train_id = app_meal_train__dates.train_id
+                 AND g.date_id = app_meal_train__dates.id
+            )`,
+        [currentMember.id, dish, at, dateId]
+      );
+      if (result.changed !== 1) {
+        await loadData();
+        showError("That night was just taken. Your claim was not saved.");
+        return false;
+      }
+    }
+    const i = dates.findIndex(d => d.id === dateId);
+    if (i !== -1) dates[i] = { ...dates[i], status: "covered", covered_by: currentMember.id, covered_dish: dish, covered_at: at };
+    showNotice(`You've got ${date.label}.`);
+    publish("meal_train.date_covered", dateId, { train_id: date.train_id, meal_date: date.meal_date });
+    return true;
+  } catch (e) { showError(e.message); return false; }
+}
+
+async function reopenDate(dateId) {
+  if (!canManage()) return showError("Only adults can reopen a night.");
+  try {
+    if (DB) {
+      await dbq(
+        "UPDATE app_meal_train__dates SET status = 'open', covered_by = NULL, covered_dish = '', covered_at = NULL WHERE id = ?",
+        [dateId]
+      );
+    }
+    const i = dates.findIndex(d => d.id === dateId);
+    if (i !== -1) dates[i] = { ...dates[i], status: "open", covered_by: null, covered_dish: "", covered_at: null };
+    showNotice("Night reopened.");
+  } catch (e) { showError(e.message); }
+}
+
+// `status` and the `covered_*` columns are ONE fact about a night, so this
+// writes both. Rewriting status alone left a member's claim on a night that had
+// been closed and reopened: the agenda query (which reads covered_by straight
+// off the row) would credit tonight's unclaimed meal to somebody who never
+// agreed to it, and isOrphanedCoverage — which only looks at 'covered' rows —
+// could no longer see it to flag it.
+async function toggleDateClosed(dateId) {
+  if (!canManage()) return;
+  const date = dates.find(d => d.id === dateId);
+  if (!date) return;
+  const closing = date.status !== "closed";
+  if (closing && date.status === "covered" && date.covered_by) {
+    const ok = await hubConfirm({
+      message: `Close ${date.label || date.meal_date}?`,
+      description: `${memberName(date.covered_by)} has this night. Closing it gives up their claim.`,
+      confirmLabel: "Close",
+      destructive: true,
+    });
+    if (!ok) return;
+  }
+  const fields = toggledClosedFields(date);
+  try {
+    if (DB) {
+      await dbq(
+        "UPDATE app_meal_train__dates SET status = ?, covered_by = NULL, covered_dish = '', covered_at = NULL WHERE id = ?",
+        [fields.status, dateId]
+      );
+    }
+    const i = dates.findIndex(d => d.id === dateId);
+    if (i !== -1) dates[i] = { ...dates[i], ...fields };
+    render();
+  } catch (e) { showError(e.message); }
+}
+
+// How many sign-ups this night accepts through the link. The hub enforces it
+// atomically inside the submit INSERT and fails CLOSED at zero, so setting 0
+// closes the night to visitors while a member can still take it.
+async function setCapacity(dateId, raw) {
+  if (!canManage()) return;
+  const date = dates.find(d => d.id === dateId);
+  if (!date) return;
+  const current = Number(date.capacity || 0);
+  // A cleared or nonsense field means "leave it alone". Reading it as zero
+  // would silently shut the night to the share link on a stray keystroke.
+  const next = parseCapacity(raw, current);
+  if (next === current) { render(); return; }
+  try {
+    if (DB) await dbq("UPDATE app_meal_train__dates SET capacity = ? WHERE id = ?", [next, dateId]);
+    const i = dates.findIndex(d => d.id === dateId);
+    if (i !== -1) dates[i] = { ...dates[i], capacity: next };
+    render();
+  } catch (e) { showError(e.message); render(); }
+}
+
+async function setTrainStatus(trainId, status) {
+  if (!canManage()) return showError("Only adults can close a meal train.");
+  if (status === "closed") {
+    const ok = await hubConfirm({
+      message: "Close this meal train?",
+      description: "Every share link on it stops working immediately. Nothing is deleted — you can reopen it.",
+      confirmLabel: "Close",
+    });
+    if (!ok) return;
+  }
+  try {
+    if (DB) await dbq("UPDATE app_meal_train__trains SET status = ? WHERE id = ?", [status, trainId]);
+    const i = trains.findIndex(t => t.id === trainId);
+    if (i !== -1) trains[i] = { ...trains[i], status };
+    showNotice(status === "closed" ? "Meal train closed." : "Meal train reopened.");
+  } catch (e) { showError(e.message); }
+}
+
+async function deleteTrain(trainId) {
+  if (!canManage()) return showError("Only adults can delete a meal train.");
+  const train = trains.find(t => t.id === trainId);
+  const signups = guestClaims.filter(g => g.train_id === trainId).length;
+  const ok = await hubConfirm({
+    message: `Delete "${train?.title ?? "this meal train"}"?`,
+    description: signups
+      ? `This also deletes every night and all ${signups} sign-ups collected through the shared link. It cannot be undone.`
+      : "This also deletes every night on it. It cannot be undone.",
+    confirmLabel: "Delete",
+    destructive: true,
+  });
+  if (!ok) return;
+  try {
+    // One statement, not a batch: the hub reclaims the endpoint_only guest rows
+    // (manifest delete_cascades) inside this DELETE's own transaction, and the
+    // batch form refuses a declared table rather than skipping the cascade.
+    if (DB) await dbq("DELETE FROM app_meal_train__trains WHERE id = ?", [trainId]);
+    trains = trains.filter(t => t.id !== trainId);
+    dates = dates.filter(d => d.train_id !== trainId);
+    guestClaims = guestClaims.filter(g => g.train_id !== trainId);
+    selectedTrainId = null;
+    showNotice("Meal train deleted.");
+  } catch (e) { showError(e.message); }
+}
+
+// ── render ──
+function renderMessages() {
+  return `${error ? `<div class="error">${esc(error)}</div>` : ""}${notice ? `<div class="notice">${esc(notice)}</div>` : ""}`;
+}
+function renderTabs() {
+  return `
+    <div class="tabs">
+      <button class="tab ${view === "active" ? "active" : ""}" data-tab="active" data-testid="tab-active">Active</button>
+      <button class="tab ${view === "closed" ? "active" : ""}" data-tab="closed" data-testid="tab-closed">Closed</button>
+    </div>`;
+}
+function renderTrainCard(train) {
+  const t = trainTotals(train.id);
+  const cls = t.complete ? "good" : t.handled ? "info" : "warn";
+  return `
+    <article class="card train-card" data-testid="train-card" data-train-id="${esc(train.id)}" data-open-train="${esc(train.id)}">
+      <div class="head">
+        <div>
+          <div class="title" data-testid="train-card-title">${esc(train.title)}</div>
+          ${train.recipient ? `<div class="meta">For ${esc(train.recipient)}</div>` : ""}
+        </div>
+        <span class="pill ${cls}" data-testid="train-card-progress">${t.handled}/${t.total} nights covered</span>
+      </div>
+      ${train.description ? `<p class="meta">${esc(train.description)}</p>` : ""}
+      <div class="progress" aria-hidden="true"><span style="width:${t.pct}%"></span></div>
+    </article>`;
+}
+function renderList() {
+  return `
+    <div class="topbar">
+      <div><h1>Meal Train</h1><p class="muted tiny">Line up the nights, share one link, let people claim a night.</p></div>
+      ${canManage() ? `<button class="btn" data-testid="new-train" data-view-create>New meal train</button>` : ""}
+    </div>
+    ${renderMessages()}
+    ${renderTabs()}
+    <div class="section-head"><h2>${view === "closed" ? "Closed" : "Active"} meal trains</h2><button class="btn btn-ghost btn-sm" data-refresh>Refresh</button></div>
+    ${trains.length ? `<div class="search-row"><input id="search" class="search-input" type="search" placeholder="Search meal trains…" aria-label="Search meal trains" value="${esc(searchQ)}" /></div>` : ""}
+    <section class="stack" id="train-list">${renderTrainList()}</section>`;
+}
+// Owns the filtering and the empty states, so the keystroke handler can refresh
+// the list without repeating how it is derived.
+function renderTrainList() {
+  const wanted = view === "closed" ? "closed" : "open";
+  const visible = trains.filter(t => (t.status ?? "open") === wanted);
+  const shown = searchQ ? visible.filter(t => searchMatch(searchQ, searchableFields(t))) : visible;
+  if (shown.length) return shown.map(renderTrainCard).join("");
+  if (searchQ) return `<div class="card empty">No meal trains match "${esc(searchQ)}".</div>`;
+  return `<div class="card empty">${wanted === "closed" ? "No closed meal trains." : "No meal trains yet."}</div>`;
+}
+
+function renderGuestChip(guest) {
+  const name = guest.guest_name || "A neighbour";
+  const detail = [guest.bringing, guest.guest_note].filter(Boolean).join(" · ");
+  return `
+    <span class="chip" data-testid="guest-claim" ${guest.guest_note ? `title="${esc(guest.guest_note)}"` : ""}>
+      <span class="avatar" style="background:var(--hub-border,#e5e7eb)">${esc(initial(name))}</span>
+      ${esc(name)}${detail ? ` <span class="muted tiny">· ${esc(detail)}</span>` : ""}
+      <span class="muted tiny">${esc(fmtStamp(guest.created_at))}</span>
+    </span>`;
+}
+
+// The share-link half of a night. Member coverage renders above; these sit
+// below, tallied against `capacity`, which the hub counts over `guest_claims`
+// alone. The rows are read-only — `guest_claims` is endpoint_only, so nothing
+// in the app may edit or delete a sign-up a visitor authored. The allowance
+// input is the only control here, and it writes to `dates` (adult_writable).
+function renderDayGuests(date) {
+  const guests = guestsFor(date.id);
+  const allowance = Number(date.capacity || 0);
+  // Zero spots is "not on offer to visitors", not "the link filled it" — say so
+  // rather than showing a satisfied 0/0.
+  const linkOpen = acceptsLinkSignups(date);
+  const editable = share.enabled && canManage();
+  if (!guests.length && !editable) return "";
+  return `
+    <div class="day-guests" data-testid="day-guests" data-date-id="${esc(date.id)}">
+      <div class="day-guest-head">
+        <span class="muted tiny">From the shared link</span>
+        ${linkOpen
+          ? `<span class="pill ${isDateGuestFull(date, guestClaims) ? "good" : "info"}" data-testid="day-guest-tally">${guests.length}/${allowance}</span>`
+          : `<span class="pill" data-testid="day-guest-tally" data-link-closed="1">${guests.length}/0 · closed to the link</span>`}
+      </div>
+      ${guests.length ? `<div class="chips" data-testid="day-guest-claims">${guests.map(renderGuestChip).join("")}</div>` : ""}
+      ${editable ? `
+        <label class="muted tiny day-guest-cap">
+          Link spots
+          <input type="number" min="0" value="${esc(String(allowance))}"
+                 data-testid="day-capacity" data-capacity="${esc(date.id)}"
+                 aria-label="Link spots for ${esc(date.label)}" />
+        </label>` : ""}
+    </div>`;
+}
+
+function renderDay(date) {
+  const state = dateState(date, guestClaims);
+  const orphaned = isOrphanedCoverage(date);
+  const mine = date.covered_by && date.covered_by === currentMember?.id;
+
+  let badge = `<span class="pill warn" data-testid="day-state-open">Needs a meal</span>`;
+  if (state === "covered") badge = `<span class="pill good" data-testid="day-state-covered">Covered</span>`;
+  else if (state === "closed") badge = `<span class="pill" data-testid="day-state-closed">Closed</span>`;
+  else if (state === "full") badge = `<span class="pill good" data-testid="day-state-full">Covered by the link</span>`;
+
+  let coverage = "";
+  if (state === "covered" && !orphaned) {
+    coverage = `
+      <div class="chips" data-testid="day-member-claim">
+        <span class="chip">
+          <span class="avatar" style="background:${esc(memberColor(date.covered_by, members))}">${esc(initial(memberName(date.covered_by)))}</span>
+          ${esc(memberName(date.covered_by))}${date.covered_dish ? ` <span class="muted tiny">· ${esc(date.covered_dish)}</span>` : ""}
+        </span>
+      </div>`;
+  } else if (orphaned) {
+    coverage = `<div class="warn-box" data-testid="day-orphaned">Whoever had this night has left the household. Reopen it so someone else can take it.</div>`;
+  }
+
+  let action = "";
+  if (state === "covered") {
+    action = canManage()
+      ? `<button class="btn btn-ghost btn-sm" data-testid="day-reopen" data-reopen="${esc(date.id)}">${mine ? "Give it up" : "Reopen"}</button>`
+      : "";
+  } else if (state === "open" && canManage()) {
+    action = `<button class="btn btn-sm" data-testid="day-cover" data-cover="${esc(date.id)}">I'll bring this one</button>`;
+  }
+
+  return `
+    <div class="day" data-testid="day-card" data-date-id="${esc(date.id)}">
+      <div class="day-top">
+        <div>
+          <div class="day-name" data-testid="day-label">${esc(date.label || date.meal_date)}</div>
+          ${date.note ? `<div class="meta">${esc(date.note)}</div>` : ""}
+        </div>
+        ${badge}
+      </div>
+      ${coverage}
+      ${renderDayGuests(date)}
+      <div class="actions">
+        ${action}
+        ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="day-toggle" data-toggle="${esc(date.id)}">${date.status === "closed" ? "Reopen" : "Close"}</button>` : ""}
+        ${canManage() ? `<button class="btn btn-quiet-danger" data-testid="day-remove" data-remove-date="${esc(date.id)}">Remove</button>` : ""}
+      </div>
+    </div>`;
+}
+
+function renderDetail() {
+  const train = selectedTrain();
+  if (!train) return renderList();
+  const t = trainTotals(train.id);
+  const closed = (train.status ?? "open") === "closed";
+  const days = trainDates(train.id);
+  return `
+    <button class="btn btn-ghost btn-sm back" data-back>Back</button>
+    ${renderMessages()}
+    <section class="card stack">
+      <div class="head">
+        <div>
+          <h1 data-testid="train-title">${esc(train.title)}</h1>
+          ${train.recipient ? `<p class="muted">For ${esc(train.recipient)}</p>` : ""}
+        </div>
+        <div class="tools">
+          <span class="pill ${t.complete ? "good" : "info"}" data-testid="train-progress">${t.handled}/${t.total} covered</span>
+          ${closed ? `<span class="pill" data-testid="train-closed">Closed</span>` : ""}
+          ${share.enabled && canManage() && !closed ? `<button class="btn btn-ghost btn-sm" data-testid="train-share" data-share="${esc(train.id)}">🔗 Share</button>` : ""}
+          ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="train-edit" data-edit="${esc(train.id)}">Edit</button>` : ""}
+          ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="train-status" data-set-status="${esc(train.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
+          ${canManage() ? `<button class="btn btn-quiet-danger" data-testid="train-delete" data-delete-train="${esc(train.id)}">Delete</button>` : ""}
+        </div>
+      </div>
+      ${train.description ? `<p>${esc(train.description)}</p>` : ""}
+      ${train.dietary_notes ? `<p class="meta"><strong>Dietary:</strong> ${esc(train.dietary_notes)}</p>` : ""}
+      ${train.delivery_notes ? `<p class="meta"><strong>Delivering:</strong> ${esc(train.delivery_notes)}</p>` : ""}
+    </section>
+    <section class="card" data-testid="day-list">
+      <h2>Nights</h2>
+      ${days.length ? days.map(renderDay).join("") : `<div class="empty">No nights yet — add the ones that need a meal.</div>`}
+      ${canManage() ? `
+        <form class="add-day" id="add-day-form">
+          <div class="field"><label for="d-date">Date</label><input id="d-date" name="meal_date" type="date" data-testid="field-day-date" required /></div>
+          <div class="field"><label for="d-note">Note</label><input id="d-note" name="note" data-testid="field-day-note" placeholder="Dinner for 4, they eat at 6" /></div>
+          <div class="field"><label for="d-cap">Link spots</label><input id="d-cap" name="capacity" type="number" min="0" value="1" data-testid="field-day-capacity" /></div>
+          <button class="btn btn-sm" type="submit" data-testid="add-day">Add night</button>
+        </form>` : ""}
+    </section>`;
+}
+
+function renderForm() {
+  const train = editingTrainId ? trains.find(t => t.id === editingTrainId) : null;
+  const v = (k) => esc(train?.[k] ?? "");
+  return `
+    <button class="btn btn-ghost btn-sm back" data-view-active>Back</button>
+    <div class="topbar"><h1>${train ? "Edit meal train" : "New meal train"}</h1></div>
+    ${renderMessages()}
+    <form class="card form" id="train-form">
+      <div class="grid two">
+        <div class="field"><label for="f-title">Title</label><input id="f-title" name="title" data-testid="field-title" value="${v("title")}" placeholder="Meals for the Alvarez family" required /></div>
+        <div class="field"><label for="f-recipient">Who it's for</label><input id="f-recipient" name="recipient" data-testid="field-recipient" value="${v("recipient")}" placeholder="Dana & Miguel" /></div>
+      </div>
+      <div class="field"><label for="f-desc">About</label><textarea id="f-desc" name="description" data-testid="field-description" placeholder="What's happening, and anything helpers should know.">${v("description")}</textarea></div>
+      <div class="grid two">
+        <div class="field"><label for="f-diet">Dietary needs</label><input id="f-diet" name="dietary_notes" data-testid="field-dietary" value="${v("dietary_notes")}" placeholder="No dairy, no nuts" /></div>
+        <div class="field"><label for="f-deliver">Delivering</label><input id="f-deliver" name="delivery_notes" data-testid="field-delivery" value="${v("delivery_notes")}" placeholder="Cooler on the porch, don't ring the bell" /></div>
+      </div>
+      <div class="grid two">
+        <div class="field"><label for="f-start">First night</label><input id="f-start" name="start_date" type="date" data-testid="field-start" value="${v("start_date") || today()}" /></div>
+        <div class="field"><label for="f-end">Last night</label><input id="f-end" name="end_date" type="date" data-testid="field-end" value="${v("end_date")}" /></div>
+      </div>
+      ${train ? "" : `
+        <label class="share-opt">
+          <input type="checkbox" name="fill_range" data-testid="field-fill-range" checked /> Add a night for every day in that range
+        </label>`}
+      <div class="actions">
+        <button class="btn" type="submit" data-testid="submit-train">${train ? "Save changes" : "Open meal train"}</button>
+      </div>
+    </form>`;
+}
+
+// ── modal ──
+let modalEl = null;
+function closeModal() { modalEl?.remove(); modalEl = null; }
+// One modal element for the whole app, so opening the share dialog over a
+// cover dialog replaces it rather than stacking two backdrops.
+function openModal(inner, { width = 400, testid = "modal" } = {}) {
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.style.cssText = "position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;";
+  modalEl.innerHTML = `<div class="card" data-testid="${testid}" style="max-width:${width}px;width:100%;max-height:90vh;overflow:auto;">${inner}</div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+  return modalEl;
+}
+
+function openCoverModal(dateId) {
+  const date = dates.find(d => d.id === dateId);
+  if (!date) return;
+  openModal(`
+    <h2 style="margin-bottom:2px;">${esc(date.label || date.meal_date)}</h2>
+    <p class="muted tiny" style="margin-bottom:10px;">Taking this night closes it — to the household and to the shared link.</p>
+    <div class="field"><label for="m-dish">What are you bringing?</label><input id="m-dish" data-testid="field-cover-dish" maxlength="160" placeholder="Chicken and rice" /></div>
+    <div class="actions" style="margin-top:12px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" data-modal-cancel>Cancel</button>
+      <button class="btn btn-sm" data-testid="cover-submit" data-modal-cover="${esc(dateId)}">I've got it</button>
+    </div>`, { testid: "cover-modal" });
+  modalEl.querySelector("#m-dish")?.focus();
+}
+async function submitCover(dateId) {
+  const dish = (modalEl?.querySelector("#m-dish")?.value ?? "").trim();
+  const btn = modalEl?.querySelector("[data-modal-cover]");
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  const ok = await coverDate(dateId, dish);
+  if (ok) closeModal();
+  else if (btn) { btn.disabled = false; btn.textContent = "I've got it"; }
+}
+
+// ── share links ──
+let _shareLinks = [];
+let _shareEntitled = false;
+
+async function openShareModal(trainId) {
+  const train = trains.find(t => t.id === trainId);
+  if (!train) return;
+  const status = await share.status();
+  _shareLinks = status.links;
+  _shareEntitled = status.entitled;
+  const active = _shareLinks.filter(l =>
+    l.itemId === trainId && !l.revokedAt && new Date(l.expiresAt) > new Date());
+
+  const rows = active.map(l => `
+    <div class="share-row" data-testid="share-link" data-link-id="${esc(l.id)}">
+      <div style="flex:1;min-width:0">
+        <input class="share-url" readonly value="${esc(l.url)}" onclick="this.select()" />
+        <div class="muted tiny" style="margin-top:3px">
+          Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${
+            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ✍️ collects sign-ups` : ""}${
+            l.hasPassword ? " · 🔒 password" : ""}
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
+      <button class="btn btn-danger btn-sm" data-share-revoke="${esc(l.id)}" data-train-id="${esc(trainId)}">Revoke</button>
+    </div>`).join("");
+
+  // The date select on the public form is `required`, so a train with no open
+  // night has nothing a visitor can pick and the form fails closed. That is
+  // right when the train is covered and wrong when nobody laid out the nights
+  // yet — either way the organizer should hear it here, not from a confused
+  // neighbour.
+  const open = openForForm(trainId).length;
+  const warning = open === 0
+    ? `<div class="warn-box" data-testid="share-no-dates">No nights are open right now, so nobody can sign up through the link. Add a night, or reopen one, first.</div>`
+    : "";
+
+  // Premium (`sharing`) controls: a writable link, a password, a long expiry. A
+  // read-only link still shows the train and who has signed up; collecting
+  // sign-ups is the premium half.
+  const premiumControls = _shareEntitled ? `
+    <label class="share-opt">
+      <input type="checkbox" id="share-writable" data-testid="share-writable" /> Let people claim a night through the link
+    </label>
+    <input id="share-password" type="text" placeholder="Optional password (min 4 chars)" autocomplete="off" />
+  ` : "";
+
+  openModal(`
+    <h2 style="margin-bottom:2px;">Share "${esc(train.title)}"</h2>
+    <p class="muted tiny" style="margin-bottom:10px;">
+      Anyone with the link can see the train and who's bringing what — no account needed. Links expire automatically.
+    </p>
+    ${warning}
+    ${rows || `<p class="muted tiny" style="padding:8px 0">No active links yet.</p>`}
+    ${premiumControls}
+    <div class="share-create">
+      <select id="share-expiry">
+        <option value="24">1 day</option>
+        <option value="168" selected>7 days</option>
+        <option value="720">30 days</option>
+        ${_shareEntitled ? `<option value="8760">1 year</option>` : ""}
+      </select>
+      <button class="btn btn-sm" data-testid="share-create" data-share-create="${esc(trainId)}">Create link</button>
+    </div>
+    <div class="actions" style="margin-top:14px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" data-modal-cancel>Close</button>
+    </div>`, { width: 520, testid: "share-modal" });
+}
+
+async function createShareLink(trainId) {
+  const train = trains.find(t => t.id === trainId);
+  const hours = Number(document.getElementById("share-expiry")?.value) || undefined;
+  const writable = !!document.getElementById("share-writable")?.checked;
+  const password = document.getElementById("share-password")?.value?.trim() || undefined;
+  const btn = modalEl?.querySelector("[data-share-create]");
+  if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+  try {
+    const link = await share.create("train", trainId, { expiresInHours: hours, label: train?.title, writable, password });
+    try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
+    await openShareModal(trainId);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
+    hubAlert("Couldn't create share link", { description: err.message });
+  }
+}
+
+async function copyShareLink(id) {
+  const link = _shareLinks.find(l => l.id === id);
+  if (!link) return;
+  try { await navigator.clipboard.writeText(link.url); }
+  catch { hubAlert("Couldn't copy — select the link text and copy it manually."); }
+}
+
+async function revokeShareLink(id, trainId) {
+  if (!await hubConfirm({ message: "Revoke this share link?", description: "Anyone using it will immediately lose access.", confirmLabel: "Revoke" })) return;
+  try { await share.revoke(id); await openShareModal(trainId); }
+  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); }
+}
+
+function render() {
+  const root = document.getElementById("root");
+  root.className = "app";
+  if (view === "create") root.innerHTML = renderForm();
+  else if (selectedTrainId) root.innerHTML = renderDetail();
+  else root.innerHTML = renderList();
+}
+
+// ── events ──
+document.addEventListener("click", (event) => {
+  const t = event.target.closest("button, [data-open-train]");
+  if (!t) return;
+  const open = t.getAttribute("data-open-train");
+  if (open) { selectedTrainId = open; clearMessages(); render(); return; }
+  if (t.matches("[data-back], [data-view-active]")) { selectedTrainId = null; editingTrainId = null; view = "active"; clearMessages(); render(); return; }
+  if (t.matches("[data-view-create]")) { view = "create"; editingTrainId = null; selectedTrainId = null; clearMessages(); render(); return; }
+  if (t.hasAttribute("data-tab")) { view = t.getAttribute("data-tab"); selectedTrainId = null; clearMessages(); render(); return; }
+  if (t.matches("[data-refresh]")) { refresh(); return; }
+  if (t.hasAttribute("data-edit")) { editingTrainId = t.getAttribute("data-edit"); view = "create"; clearMessages(); render(); return; }
+  if (t.matches("[data-modal-cancel]")) { closeModal(); return; }
+  if (t.hasAttribute("data-modal-cover")) { submitCover(t.getAttribute("data-modal-cover")); return; }
+  if (t.hasAttribute("data-cover")) { openCoverModal(t.getAttribute("data-cover")); return; }
+  if (t.hasAttribute("data-reopen")) { reopenDate(t.getAttribute("data-reopen")); return; }
+  if (t.hasAttribute("data-toggle")) { toggleDateClosed(t.getAttribute("data-toggle")); return; }
+  if (t.hasAttribute("data-remove-date")) { removeDate(t.getAttribute("data-remove-date")); return; }
+  if (t.hasAttribute("data-set-status")) {
+    const id = t.getAttribute("data-set-status");
+    const train = trains.find(x => x.id === id);
+    setTrainStatus(id, (train?.status ?? "open") === "closed" ? "open" : "closed");
+    return;
+  }
+  if (t.hasAttribute("data-delete-train")) { deleteTrain(t.getAttribute("data-delete-train")); return; }
+  if (t.hasAttribute("data-share")) { openShareModal(t.getAttribute("data-share")); return; }
+  if (t.hasAttribute("data-share-create")) { createShareLink(t.getAttribute("data-share-create")); return; }
+  if (t.hasAttribute("data-share-copy")) { copyShareLink(t.getAttribute("data-share-copy")); return; }
+  if (t.hasAttribute("data-share-revoke")) { revokeShareLink(t.getAttribute("data-share-revoke"), t.getAttribute("data-train-id")); return; }
+});
+
+// Re-render only the list on each keystroke so the search box keeps focus.
+document.addEventListener("input", (event) => {
+  if (event.target.id !== "search") return;
+  searchQ = event.target.value;
+  const el = document.getElementById("train-list");
+  if (el) el.innerHTML = renderTrainList();
+});
+
+// "change", not "input": the allowance write re-renders, and a re-render on
+// every keystroke would tear the field out from under the cursor.
+document.addEventListener("change", (event) => {
+  const input = event.target.closest("[data-capacity]");
+  if (!input) return;
+  setCapacity(input.getAttribute("data-capacity"), input.value);
+});
+
+document.addEventListener("submit", (event) => {
+  if (event.target.id === "train-form") { event.preventDefault(); saveTrain(event.target); return; }
+  if (event.target.id === "add-day-form") { event.preventDefault(); addDate(event.target); return; }
+});
+
+refresh({ deepLink: true });
+</script>
+</body>
+</html>

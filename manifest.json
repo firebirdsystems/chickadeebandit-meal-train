@@ -1,0 +1,243 @@
+{
+  "id": "meal-train",
+  "name": "Meal Train",
+  "version": "1.0.0",
+  "description": "Organize meals for a family going through something — a new baby, a surgery, a loss. Lay out the dates that need dinner, share one link, and neighbours, church, and coworkers claim a night and say what they're bringing. No account needed.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "category": "family",
+  "tags": [
+    "meals",
+    "care",
+    "new-baby",
+    "recovery",
+    "community",
+    "sharing"
+  ],
+  "icon": "🍲",
+  "nav": { "label": "Meal Train" },
+  "contexts": [
+    "household",
+    "shared_space"
+  ],
+  "data_access": {
+    "reads": [
+      "family.members"
+    ],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "storage": "db",
+
+  "db_plaintext_columns": [
+    "capacity",
+    "guest_name",
+    "bringing",
+    "guest_note"
+  ],
+
+  "row_policies": {
+    "trains": {
+      "kind": "adult_writable"
+    },
+    "dates": {
+      "kind": "adult_writable"
+    },
+    "guest_claims": {
+      "kind": "endpoint_only",
+      "read": "everyone",
+      "max_rows": 200
+    }
+  },
+
+  "shareable": {
+    "train": {
+      "table": "trains",
+      "title_column": "title",
+      "columns": [
+        { "column": "recipient", "label": "Who this is for" },
+        { "column": "description", "label": "About", "format": "multiline" },
+        { "column": "dietary_notes", "label": "Dietary needs", "format": "multiline" },
+        { "column": "delivery_notes", "label": "Delivering", "format": "multiline" }
+      ],
+      "visible_where": { "column": "status", "values": ["open"] },
+      "aggregates": [
+        {
+          "label": "Meals offered through this link",
+          "table": "guest_claims",
+          "fk_column": "train_id",
+          "op": "count"
+        },
+        {
+          "label": "Days people have taken",
+          "table": "guest_claims",
+          "fk_column": "train_id",
+          "op": "list",
+          "value_column": "date_id",
+          "lookup": { "table": "dates", "label_column": "label" },
+          "max_items": 100
+        }
+      ],
+      "feed": {
+        "label": "Who's bringing what",
+        "table": "guest_claims",
+        "fk_column": "train_id",
+        "columns": [
+          { "column": "guest_name", "label": "From", "role": "heading" },
+          { "column": "bringing", "label": "Bringing", "role": "detail" },
+          { "column": "guest_note", "label": "Note", "role": "detail" },
+          { "column": "created_at", "label": "Signed up", "format": "datetime", "role": "timestamp" }
+        ],
+        "order_column": "created_at",
+        "order": "oldest",
+        "max_items": 200,
+        "empty_text": "Nobody has claimed a night yet — be the first."
+      },
+      "submit": {
+        "table": "guest_claims",
+        "fk_column": "train_id",
+        "fields": [
+          {
+            "column": "guest_name",
+            "label": "Your name",
+            "type": "text",
+            "required": true,
+            "max_length": 80
+          },
+          {
+            "column": "date_id",
+            "label": "Which day can you bring a meal?",
+            "type": "select",
+            "required": true,
+            "values_from": {
+              "table": "dates",
+              "fk_column": "train_id",
+              "id_column": "id",
+              "label_column": "label",
+              "capacity_column": "capacity",
+              "where": [
+                { "column": "status", "values": ["open"] }
+              ]
+            }
+          },
+          {
+            "column": "bringing",
+            "label": "What are you bringing?",
+            "type": "text",
+            "required": true,
+            "max_length": 160
+          },
+          {
+            "column": "guest_note",
+            "label": "Anything else? (delivery time, allergies you've handled)",
+            "type": "text",
+            "required": false,
+            "max_length": 200
+          }
+        ],
+        "max_submissions": 200,
+        "event": "meal_train.meal_offered"
+      }
+    }
+  },
+
+  "automation_actions": {
+    "open_train": {
+      "title": "Open a meal train",
+      "description": "Open a meal train for something another app already knows is coming — a due date, a surgery, a bereavement on the calendar. Only the train itself is opened; which nights need a meal is a human decision, so an adult lays out the dates before sharing the link.",
+      "params": {
+        "title": { "type": "text", "label": "Train title", "required": true },
+        "recipient": { "type": "text", "label": "Who it's for", "default": "" },
+        "start_date": { "type": "text", "label": "Starts (yyyy-mm-dd)", "default": "" },
+        "description": { "type": "text", "label": "About", "default": "" }
+      },
+      "dedupe": { "table": "trains", "column": "source_event_id" },
+      "steps": [
+        {
+          "op": "insert",
+          "table": "trains",
+          "values": {
+            "id": "$uuid",
+            "title": ":title",
+            "recipient": ":recipient",
+            "description": ":description",
+            "start_date": ":start_date",
+            "status": "open",
+            "created_by": "automation",
+            "created_by_name": "Automation",
+            "created_at": "$now",
+            "source_event_id": "$event_id"
+          }
+        }
+      ]
+    }
+  },
+
+  "suggested_automations": [
+    {
+      "title": "Open a meal train when a date lands on the calendar",
+      "description": "A due date or a surgery goes on the calendar weeks before anyone thinks to organize meals. This opens the train the same day, so it is waiting when someone does.",
+      "trigger_event": "calendar.event_created",
+      "target_app_id": "meal-train",
+      "action_id": "open_train",
+      "param_map": {
+        "title": { "kind": "payload_field", "value": "title" },
+        "start_date": { "kind": "payload_field", "value": "start_date" },
+        "description": { "kind": "const", "value": "Add the nights that need a meal, then share the link." }
+      }
+    }
+  ],
+
+  "publishes": [
+    "meal_train.train_opened",
+    "meal_train.date_covered"
+  ],
+  "publish_acls": {
+    "meal_train.train_opened": { "require_role": "adult" },
+    "meal_train.date_covered": { "require_role": "adult" }
+  },
+
+  "member_references": {
+    "trains": { "column": "created_by", "on_removed": "keep" },
+    "dates": { "column": "covered_by", "on_removed": "null" }
+  },
+
+  "delete_cascades": {
+    "trains": [
+      { "table": "guest_claims", "foreign_key": "train_id" },
+      { "table": "dates", "foreign_key": "train_id" }
+    ],
+    "dates": [
+      { "table": "guest_claims", "foreign_key": "date_id" }
+    ]
+  },
+
+  "agenda": {
+    "kind": "meal",
+    "label": "Meal Train",
+    "source": {
+      "kind": "sql",
+      "query": "SELECT d.id AS id, d.train_title AS title, d.meal_date AS when_at, NULLIF(d.note, '') AS subtitle, d.covered_by AS member_id FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' WHERE d.meal_date = :today AND d.status != 'closed' ORDER BY d.created_at LIMIT 10"
+    }
+  },
+
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT d.train_title AS title, NULLIF(d.note, '') AS subtitle, d.meal_date AS at FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' WHERE d.status = 'open' AND d.meal_date >= :today AND NOT (COALESCE(d.capacity, 0) > 0 AND (SELECT COUNT(*) FROM app_meal_train__guest_claims g WHERE g.train_id = d.train_id AND g.date_id = d.id) >= COALESCE(d.capacity, 0)) ORDER BY d.meal_date LIMIT 3"
+    },
+    "display": {
+      "template": "list",
+      "title": "title",
+      "subtitle": "subtitle",
+      "when": "at"
+    }
+  },
+
+  "resource_limits": {
+    "max_db_bytes": 52428800
+  }
+}

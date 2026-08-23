@@ -1,0 +1,439 @@
+{
+  "scenarios": [
+    {
+      "name": "a night covered by a member and one covered by the link read differently but count the same",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('ui-tr1', ?, ?, '', '', '', '2026-03-01', '2026-03-04', 'open', ?, 'Host', datetime('now'))",
+          "params": [
+            "Meals for the Alvarez family",
+            "Dana & Miguel",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('ui-d1', 'ui-tr1', '2026-03-01', ?, ?, '', 1, 'open', '', datetime('now'))",
+          "params": [
+            "Sun, Mar 1",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_by, covered_dish, covered_at, created_at) VALUES ('ui-d2', 'ui-tr1', '2026-03-02', ?, ?, '', 1, 'covered', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "Mon, Mar 2",
+            "Meals for the Alvarez family",
+            "{{host}}",
+            "Chicken and rice"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('ui-d3', 'ui-tr1', '2026-03-03', ?, ?, '', 1, 'open', '', datetime('now'))",
+          "params": [
+            "Tue, Mar 3",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('ui-d4', 'ui-tr1', '2026-03-04', ?, ?, '', 1, 'closed', '', datetime('now'))",
+          "params": [
+            "Wed, Mar 4",
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, guest_note, created_at) VALUES ('ui-g1', 'ui-tr1', 'ui-d3', 'Marta Okafor', 'Lasagna', '', datetime('now'))"
+        },
+        {
+          "action": "open"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr1\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr1\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"day-list\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"]",
+          "count": 4
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"] [data-testid=\"day-state-open\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d2\"] [data-testid=\"day-state-covered\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d3\"] [data-testid=\"day-state-full\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d4\"] [data-testid=\"day-state-closed\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "Chicken and rice",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d2\"] [data-testid=\"day-member-claim\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"day-guests\"][data-date-id=\"ui-d3\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "1/1",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d3\"] [data-testid=\"day-guest-tally\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "0/1",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"] [data-testid=\"day-guest-tally\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"] [data-testid=\"guest-claim\"]",
+          "count": 0
+        },
+        {
+          "action": "expectNoText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "2/3 covered",
+          "selector": "[data-testid=\"train-progress\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"] [data-testid=\"day-cover\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d3\"] [data-testid=\"day-cover\"]",
+          "count": 0
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d2\"] [data-testid=\"day-reopen\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-capacity\"]",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "name": "a child reads who is bringing what but gets no organizer controls and cannot take a night",
+      "members": {
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('ui-tr1', ?, '', '', '', '', '2026-03-01', '2026-03-02', 'open', 'someone-else', 'Host', datetime('now'))",
+          "params": [
+            "Recovery meals"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('ui-d1', 'ui-tr1', '2026-03-01', ?, ?, '', 2, 'open', '', datetime('now'))",
+          "params": [
+            "Sun, Mar 1",
+            "Recovery meals"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, guest_note, created_at) VALUES ('ui-g1', 'ui-tr1', 'ui-d1', 'Marta Okafor', 'Lasagna', '', datetime('now'))"
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr1\"]",
+          "as": "kid"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr1\"]",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"day-list\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"day-guests\"][data-date-id=\"ui-d1\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-capacity\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"train-share\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"train-edit\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"train-delete\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-toggle\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-remove\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"add-day\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"new-train\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d1\"] [data-testid=\"day-cover\"]",
+          "count": 0,
+          "as": "kid"
+        }
+      ]
+    },
+    {
+      "name": "sharing a train with no open night warns that the form has nothing to offer",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at, source_event_id) VALUES ('ui-tr-auto', ?, '', '', '', '', '2026-03-01', '', 'open', 'automation', 'Automation', datetime('now'), 'ev-src-1')",
+          "params": [
+            "Surgery recovery"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('ui-tr-open', ?, '', '', '', '', '2026-03-01', '', 'open', ?, 'Host', datetime('now'))",
+          "params": [
+            "New baby meals",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES ('ui-d-open', 'ui-tr-open', '2026-03-01', ?, ?, '', 1, 'open', '', datetime('now'))",
+          "params": [
+            "Sun, Mar 1",
+            "New baby meals"
+          ]
+        },
+        {
+          "action": "open"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-auto\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-auto\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"day-list\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"]",
+          "count": 0
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-share\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"share-modal\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"share-no-dates\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-modal-cancel]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"share-modal\"]",
+          "state": "detached"
+        },
+        {
+          "action": "click",
+          "selector": "[data-back]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-open\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-open\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"day-list\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-share\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"share-modal\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"share-no-dates\"]",
+          "count": 0
+        }
+      ]
+    },
+    {
+      "name": "a night with no link spots still needs a meal \u2014 it is closed to visitors, not covered",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, dietary_notes, delivery_notes, start_date, end_date, status, created_by, created_by_name, created_at) VALUES ('ui-tr-cap', ?, '', '', '', '', '2026-03-01', '2026-03-02', 'open', 'someone-else', 'Host', datetime('now'))",
+          "params": [
+            "Meals for the Alvarez family"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES (?, 'ui-tr-cap', ?, ?, ?, '', ?, 'open', '', datetime('now'))",
+          "params": [
+            "ui-d-cap0",
+            "2026-03-01",
+            "Sun, Mar 1",
+            "Meals for the Alvarez family",
+            0
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, label, train_title, note, capacity, status, covered_dish, created_at) VALUES (?, 'ui-tr-cap', ?, ?, ?, '', ?, 'open', '', datetime('now'))",
+          "params": [
+            "ui-d-cap1",
+            "2026-03-02",
+            "Mon, Mar 2",
+            "Meals for the Alvarez family",
+            1
+          ]
+        },
+        {
+          "action": "open"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-cap\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"train-card\"][data-train-id=\"ui-tr-cap\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"day-list\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap0\"] [data-testid=\"day-state-open\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap0\"] [data-testid=\"day-state-full\"]",
+          "count": 0
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap0\"] [data-testid=\"day-cover\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap0\"] [data-testid=\"day-guest-tally\"][data-link-closed=\"1\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "closed to the link",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap0\"] [data-testid=\"day-guest-tally\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"day-card\"][data-date-id=\"ui-d-cap1\"] [data-testid=\"day-guest-tally\"][data-link-closed=\"1\"]",
+          "count": 0
+        },
+        {
+          "action": "expectText",
+          "text": "0/2 covered",
+          "selector": "[data-testid=\"train-progress\"]"
+        }
+      ]
+    }
+  ]
+}
