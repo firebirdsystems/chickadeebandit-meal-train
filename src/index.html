@@ -130,7 +130,7 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday } from "/hub-sdk.js";
 import {
   canManage as _canManage, resolveCurrentMember, dateLabel, datesInRange, normalizeTimestamp,
   guestClaimsForDate, isDateGuestFull, acceptsLinkSignups, parseCapacity,
@@ -173,11 +173,14 @@ const nowIso = () => new Date().toISOString();
 const uid = (p) => `${p}-${crypto.randomUUID()}`;
 // The device's own calendar date, built from LOCAL getters — never
 // toISOString(), which is UTC and shifts the day for half of every day.
-function today() {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
+// The HOUSEHOLD's calendar day, not the viewer device's. These dates are STORED
+// (a train's start/end, a night's meal_date) and COMPARED against stored dates,
+// and the hub's own surfaces — glance, kiosk, cron, `:today` in declared SQL —
+// are all on the household calendar. A date built from the device clock names a
+// different day near midnight or for a member in another timezone, and nothing
+// reconciles the two. hubToday() falls back to the device calendar when no zone
+// is published, so it is never worse than what it replaces.
+const today = (now = new Date()) => hubToday(now);
 function memberName(id) { return memberMap.get(id)?.name ?? "Member"; }
 function fmtStamp(v) {
   const d = new Date(normalizeTimestamp(v));
@@ -254,16 +257,56 @@ function seedDemo() {
 
 async function loadData() {
   if (!DB) { seedDemo(); return; }
+  // Only the OPEN trains and their nights. Both reads run server-side on every
+  // launch, and the app opens on the Active tab, so a household that has run
+  // meal trains for years was downloading every closed one to render a screen
+  // that does not show them. Closed trains load when that tab is opened
+  // (loadClosed) — the tabs carry no counts, so nothing on screen is a lie in
+  // the meantime.
+  //
+  // The nights are scoped with a JOIN rather than `train_id IN (SELECT ...)`:
+  // the row-policy rewriter fails closed on a governed table named only inside
+  // a subquery, while a joined table is a top-level reference and keeps its
+  // policy applied. Each train card's "n/m nights covered" tally is computed
+  // from these rows, so the nights must arrive with their train, never lagging.
   const [trainRows, dateRows, guestRows] = await Promise.all([
-    dbq("SELECT * FROM app_meal_train__trains ORDER BY start_date ASC, created_at ASC"),
-    dbq("SELECT * FROM app_meal_train__dates ORDER BY meal_date ASC, created_at ASC"),
+    dbq("SELECT * FROM app_meal_train__trains WHERE status = 'open' ORDER BY start_date ASC, created_at ASC"),
+    dbq("SELECT d.* FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' ORDER BY d.meal_date ASC, d.created_at ASC"),
     // Same order the public feed renders in (manifest shareable.train.feed,
-    // order_column created_at / oldest), so the two views agree.
+    // order_column created_at / oldest), so the two views agree. Capped at 200
+    // rows by the guest_claims policy, so this one is honest read whole.
     dbq("SELECT * FROM app_meal_train__guest_claims ORDER BY created_at ASC"),
   ]);
   trains = trainRows.rows;
   dates = dateRows.rows;
   guestClaims = guestRows.rows;
+  // A refresh rebuilds the open set from scratch, so anything the Closed tab
+  // had already pulled has just been dropped. Pull it again rather than leaving
+  // that tab silently empty until the next click.
+  if (closedLoaded) { closedLoaded = false; closedPromise = null; await loadClosed(); }
+}
+
+// The closed archive: fetched once, on demand, and merged into the same arrays
+// the rest of the app reads. The promise is the guard, so a double tap cannot
+// start two reads; a failure clears it so the next attempt retries. Both merges
+// dedup by id — a train closed during this session is already in the array.
+let closedLoaded = false;
+let closedPromise = null;
+function loadClosed() {
+  if (!DB || closedLoaded) return Promise.resolve();
+  closedPromise ??= Promise.all([
+    dbq("SELECT * FROM app_meal_train__trains WHERE status = 'closed' ORDER BY start_date ASC, created_at ASC"),
+    dbq("SELECT d.* FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'closed' ORDER BY d.meal_date ASC, d.created_at ASC"),
+  ])
+    .then(([trainRows, dateRows]) => {
+      const seenTrains = new Set(trains.map(t => t.id));
+      trains = [...trains, ...(trainRows.rows ?? []).filter(t => !seenTrains.has(t.id))];
+      const seenDates = new Set(dates.map(d => d.id));
+      dates = [...dates, ...(dateRows.rows ?? []).filter(d => !seenDates.has(d.id))];
+      closedLoaded = true;
+    })
+    .catch((e) => { closedPromise = null; throw e; });
+  return closedPromise;
 }
 
 // `deepLink` is honoured on the FIRST load only. Re-applying ?trainId on every
@@ -274,13 +317,23 @@ async function refresh({ deepLink = false } = {}) {
   try {
     await Promise.all([loadMembers(), loadData()]);
     if (selectedTrainId && !trains.some(t => t.id === selectedTrainId)) selectedTrainId = null;
-    if (deepLink) handleDeepLink();
+    if (deepLink) await handleDeepLink();
     render();
   } catch (e) { error = e.message; render(); }
 }
-function handleDeepLink() {
+async function handleDeepLink() {
   const trainId = new URLSearchParams(window.location.search).get("trainId");
-  if (trainId && trains.some(t => t.id === trainId)) selectedTrainId = trainId;
+  if (!trainId) return;
+  // A link from a notification can point at a train that has since closed, and
+  // closed trains are no longer loaded up front. Without this, following that
+  // link would quietly land on the Active list instead of the train.
+  if (!trains.some(t => t.id === trainId)) {
+    try { await loadClosed(); } catch { /* fall through to the list */ }
+  }
+  if (trains.some(t => t.id === trainId)) {
+    selectedTrainId = trainId;
+    if ((trains.find(t => t.id === trainId)?.status ?? "open") === "closed") view = "closed";
+  }
 }
 
 function clearMessages() { error = ""; notice = ""; }
@@ -976,7 +1029,16 @@ document.addEventListener("click", (event) => {
   if (open) { selectedTrainId = open; clearMessages(); render(); return; }
   if (t.matches("[data-back], [data-view-active]")) { selectedTrainId = null; editingTrainId = null; view = "active"; clearMessages(); render(); return; }
   if (t.matches("[data-view-create]")) { view = "create"; editingTrainId = null; selectedTrainId = null; clearMessages(); render(); return; }
-  if (t.hasAttribute("data-tab")) { view = t.getAttribute("data-tab"); selectedTrainId = null; clearMessages(); render(); return; }
+  if (t.hasAttribute("data-tab")) {
+    view = t.getAttribute("data-tab");
+    selectedTrainId = null;
+    clearMessages();
+    render();
+    // The closed archive is not loaded up front; pull it the first time that
+    // tab is asked for, then redraw with it.
+    if (view === "closed") loadClosed().then(render).catch((e) => { error = e.message; render(); });
+    return;
+  }
   if (t.matches("[data-refresh]")) { refresh(); return; }
   if (t.hasAttribute("data-edit")) { editingTrainId = t.getAttribute("data-edit"); view = "create"; clearMessages(); render(); return; }
   if (t.matches("[data-modal-cancel]")) { closeModal(); return; }

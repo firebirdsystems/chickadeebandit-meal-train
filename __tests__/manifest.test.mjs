@@ -208,7 +208,9 @@ describe("index.html call sites", () => {
   it("applies ?trainId on the first load only", () => {
     // handleDeepLink() used to run inside refresh(), so pressing Refresh after
     // backing out of a deep-linked train threw the organizer straight back into it.
-    expect(html).toContain("if (deepLink) handleDeepLink();");
+    // Awaited since the archive split: a ?trainId pointing at a CLOSED train
+    // now has to pull the closed set before it can select it.
+    expect(html).toContain("if (deepLink) await handleDeepLink();");
     expect(html).toContain("refresh({ deepLink: true })");
     expect(html.match(/handleDeepLink\(\)/g)).toHaveLength(2); // the guarded call + the declaration
   });
