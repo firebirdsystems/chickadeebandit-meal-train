@@ -204,6 +204,13 @@
     "meal_train.date_covered": { "require_role": "adult" }
   },
 
+  "exports": ["calendar_events"],
+  "store_acls": {
+    "calendar_events": {
+      "write": { "require_role": "adult" }
+    }
+  },
+
   "member_references": {
     "trains": { "column": "created_by", "on_removed": "keep" },
     "dates": { "column": "covered_by", "on_removed": "null" }

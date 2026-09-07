@@ -4,6 +4,7 @@ import {
   guestClaimsForDate, guestClaimCount, isDateGuestFull, acceptsLinkSignups, parseCapacity,
   dateState, isDateHandled, toggledClosedFields,
   isOrphanedCoverage, datesForTrain, openDatesForForm, trainTotals, searchableFields,
+  buildCalendarEvents, CALENDAR_EXPORT_HORIZON_DAYS, CALENDAR_EXPORT_MAX_EVENTS,
 } from "../src/logic.js";
 
 const adult = { id: "a1", name: "Alex", role: "adult" };
@@ -311,5 +312,102 @@ describe("searchableFields", () => {
     const fields = searchableFields({ title: "Two weeks of dinners", recipient: "Alvarez", description: "New baby" });
     expect(fields).toContain("Alvarez");
     expect(fields).toContain("New baby");
+  });
+});
+
+describe("buildCalendarEvents", () => {
+  const TODAY = "2026-03-01";
+  const openTrain = { id: "t1", title: "Alvarez", status: "open" };
+  const build = (dateRows, trainRows = [openTrain]) => buildCalendarEvents(trainRows, dateRows, TODAY);
+
+  it("emits an all-day entry the hub can parse", () => {
+    const [ev] = build([date({ id: "d1", meal_date: "2026-03-03" })]);
+    expect(ev).toMatchObject({
+      id: "d1",
+      title: "Alvarez",
+      description: "Open",
+      location: "",
+      start: "2026-03-03",
+      end: "2026-03-03",
+      all_day: true,
+      member_ids: [],
+      source_label: "Meal Train",
+    });
+    // The hub derives allDay from the absence of a T, so the two must agree.
+    expect(ev.start).not.toContain("T");
+  });
+
+  it("names the member who took the night, and nobody when the claim is orphaned", () => {
+    const [covered, orphaned] = build([
+      date({ id: "d1", meal_date: "2026-03-03", status: "covered", covered_by: "a1" }),
+      // member_references nulls covered_by when that person leaves; the entry
+      // must concern nobody rather than carry a null member id.
+      date({ id: "d2", meal_date: "2026-03-04", status: "covered", covered_by: null }),
+    ]);
+    expect(covered.member_ids).toEqual(["a1"]);
+    expect(covered.description).toBe("Covered");
+    expect(orphaned.member_ids).toEqual([]);
+  });
+
+  it("drops nights before today and past the horizon", () => {
+    const beyond = "2026-08-01"; // 153 days out, past the 120-day horizon
+    const ids = build([
+      date({ id: "past", meal_date: "2026-02-28" }),
+      date({ id: "today", meal_date: TODAY }),
+      date({ id: "far", meal_date: beyond }),
+    ]).map(e => e.id);
+    expect(ids).toEqual(["today"]);
+    expect(CALENDAR_EXPORT_HORIZON_DAYS).toBe(120);
+  });
+
+  it("drops a closed night and every night of a closed train", () => {
+    const closedTrain = { id: "t2", title: "Older train", status: "closed" };
+    const ids = build([
+      date({ id: "d1", meal_date: "2026-03-03", status: "closed" }),
+      date({ id: "d2", meal_date: "2026-03-04", train_id: "t2" }),
+      date({ id: "d3", meal_date: "2026-03-05", train_id: "gone" }),
+      date({ id: "d4", meal_date: "2026-03-06" }),
+    ], [openTrain, closedTrain]).map(e => e.id);
+    expect(ids).toEqual(["d4"]);
+  });
+
+  it("never exports what a member typed about the family", () => {
+    // The payload is scope-wide and reaches the ICS feed external calendar
+    // services fetch. Every one of these is free text about a household going
+    // through a new baby, a surgery, or a loss.
+    const json = JSON.stringify(build([
+      date({
+        id: "d1", meal_date: "2026-03-03", status: "covered", covered_by: "a1",
+        note: "They eat around six, the toddler is napping",
+        covered_dish: "Chicken and rice",
+      }),
+    ]));
+    expect(json).not.toContain("napping");
+    expect(json).not.toContain("Chicken and rice");
+    for (const leak of ["No dairy for Dana", "Cooler on the porch", "Dana & Miguel"]) {
+      expect(json).not.toContain(leak);
+    }
+  });
+
+  it("caps at the hub's own per-app ceiling, so no entry is shipped to be dropped", () => {
+    // calendar-feed.ts MAX_FEED_EVENTS_PER_APP and agenda.ts
+    // MAX_CROSS_APP_EVENTS_PER_APP are both 100; exporting more burns bytes.
+    expect(CALENDAR_EXPORT_MAX_EVENTS).toBe(100);
+  });
+
+  it("keeps the nearest nights when a long train overruns the cap", () => {
+    // A train running nightly for months genuinely hits this: 110 nights from
+    // today all sit inside the 120-day horizon, so the cap does the trimming.
+    const rows = Array.from({ length: CALENDAR_EXPORT_MAX_EVENTS + 10 }, (_, i) => {
+      const d = new Date("2026-03-01T00:00:00Z");
+      d.setUTCDate(d.getUTCDate() + i);
+      return date({ id: `d${i}`, meal_date: d.toISOString().slice(0, 10) });
+    });
+    // Reversed on the way in, so the ascending sort — not the input order — is
+    // what decides which nights survive the slice.
+    const out = build(rows.slice().reverse());
+    expect(out).toHaveLength(CALENDAR_EXPORT_MAX_EVENTS);
+    expect(out[0].id).toBe("d0");
+    expect(out.at(-1).id).toBe(`d${CALENDAR_EXPORT_MAX_EVENTS - 1}`);
   });
 });

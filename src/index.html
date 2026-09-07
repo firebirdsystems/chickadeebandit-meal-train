@@ -136,6 +136,7 @@ import {
   guestClaimsForDate, isDateGuestFull, acceptsLinkSignups, parseCapacity,
   dateState, isOrphanedCoverage,
   toggledClosedFields, datesForTrain, openDatesForForm, trainTotals as _trainTotals, searchableFields,
+  buildCalendarEvents,
 } from "./logic.js";
 
 const CONTEXT    = window.__CONTEXT_URL    ?? "";
@@ -143,6 +144,7 @@ const DB         = window.__DB_URL         ?? "";
 const EVENTS_URL = window.__EVENTS_URL     ?? "/api/events";
 const APP_ID     = window.__APP_ID         ?? "meal-train";
 const ME         = window.__CURRENT_MEMBER ?? null;
+const STORE_URL  = window.__STORE_URL      ?? "";
 
 // Share links. `enabled` is false unless the hub injected the URLs, which it
 // only does for a manifest declaring `shareable` — so every share control is
@@ -206,6 +208,24 @@ async function dbRequest(body) {
   if (json.error) throw new Error(json.error);
   return json;
 }
+/**
+ * Republish the `calendar_events` export so the nights that still need a meal
+ * show up on the household calendar and in the ICS feed. Best-effort and never
+ * awaited into a caller's error path: a failed sync must not roll back a night
+ * that is already written, and the next mutation republishes the whole payload
+ * anyway. Every caller is behind `canManage()`, which matches the adult gate on
+ * the store key.
+ */
+async function syncCalendar() {
+  if (!STORE_URL || !DB) return;
+  const events = buildCalendarEvents(trains, dates, today());
+  await fetch(STORE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key: "calendar_events", value: JSON.stringify(events) }),
+  }).catch(() => {});
+}
+
 function publish(type, subject_id, payload) {
   fetch(EVENTS_URL, {
     method: "POST", headers: { "Content-Type": "application/json" },
@@ -403,6 +423,7 @@ async function createTrain(fields, fillRange) {
   selectedTrainId = train.id;
   view = "active";
   editingTrainId = null;
+  await syncCalendar();
   showNotice(newDates.length ? `Meal train opened with ${newDates.length} night${newDates.length === 1 ? "" : "s"}.` : "Meal train opened. Add the nights that need a meal.");
   publish("meal_train.train_opened", train.id, { title: train.title });
   sendHubNotification({
@@ -441,6 +462,7 @@ async function updateTrain(trainId, fields) {
   editingTrainId = null;
   selectedTrainId = trainId;
   view = "active";
+  await syncCalendar();
   showNotice("Meal train updated.");
 }
 
@@ -483,6 +505,7 @@ async function addDate(form) {
     dates = [...dates, row];
     form.reset();
     form.capacity.value = "1";
+    await syncCalendar();
     showNotice(`Added ${row.label}.`);
   } catch (e) { showError(e.message); }
 }
@@ -508,6 +531,7 @@ async function removeDate(dateId) {
     if (DB) await dbq("DELETE FROM app_meal_train__dates WHERE id = ?", [dateId]);
     dates = dates.filter(d => d.id !== dateId);
     guestClaims = guestClaims.filter(g => g.date_id !== dateId);
+    await syncCalendar();
     showNotice("Night removed.");
   } catch (e) { showError(e.message); }
 }
@@ -542,6 +566,7 @@ async function coverDate(dateId, dish) {
     }
     const i = dates.findIndex(d => d.id === dateId);
     if (i !== -1) dates[i] = { ...dates[i], status: "covered", covered_by: currentMember.id, covered_dish: dish, covered_at: at };
+    await syncCalendar();
     showNotice(`You've got ${date.label}.`);
     publish("meal_train.date_covered", dateId, { train_id: date.train_id, meal_date: date.meal_date });
     return true;
@@ -559,6 +584,7 @@ async function reopenDate(dateId) {
     }
     const i = dates.findIndex(d => d.id === dateId);
     if (i !== -1) dates[i] = { ...dates[i], status: "open", covered_by: null, covered_dish: "", covered_at: null };
+    await syncCalendar();
     showNotice("Night reopened.");
   } catch (e) { showError(e.message); }
 }
@@ -593,6 +619,7 @@ async function toggleDateClosed(dateId) {
     }
     const i = dates.findIndex(d => d.id === dateId);
     if (i !== -1) dates[i] = { ...dates[i], ...fields };
+    await syncCalendar();
     render();
   } catch (e) { showError(e.message); }
 }
@@ -631,6 +658,7 @@ async function setTrainStatus(trainId, status) {
     if (DB) await dbq("UPDATE app_meal_train__trains SET status = ? WHERE id = ?", [status, trainId]);
     const i = trains.findIndex(t => t.id === trainId);
     if (i !== -1) trains[i] = { ...trains[i], status };
+    await syncCalendar();
     showNotice(status === "closed" ? "Meal train closed." : "Meal train reopened.");
   } catch (e) { showError(e.message); }
 }
@@ -657,6 +685,7 @@ async function deleteTrain(trainId) {
     dates = dates.filter(d => d.train_id !== trainId);
     guestClaims = guestClaims.filter(g => g.train_id !== trainId);
     selectedTrainId = null;
+    await syncCalendar();
     showNotice("Meal train deleted.");
   } catch (e) { showError(e.message); }
 }

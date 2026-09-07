@@ -255,3 +255,20 @@ describe("the surface scenarios run the manifest's own queries", () => {
     expect(sqlOf("AS at")).toBe(manifest.glance.source.query.replaceAll(":today", "'2026-03-01'"));
   });
 });
+
+describe("the household calendar export", () => {
+  it("publishes the nights to the household calendar", () => {
+    // The hub only aggregates an app's calendar_events export when the manifest
+    // lists it (collectCrossAppEvents filters on manifest.exports), so dropping
+    // this key silently empties the meal train off the calendar and the ICS feed.
+    expect(manifest.exports).toContain("calendar_events");
+  });
+
+  it("gates the export behind an adult", () => {
+    // Without this ACL any member could POST straight to the store key and
+    // rewrite what the household calendar and the ICS feed show. Both exported
+    // tables are adult_writable, so the app's own sync path is already
+    // adult-only — this closes the direct-POST path behind it.
+    expect(manifest.store_acls?.calendar_events?.write?.require_role).toBe("adult");
+  });
+});

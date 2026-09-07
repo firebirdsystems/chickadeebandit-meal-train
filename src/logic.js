@@ -222,3 +222,70 @@ export function trainTotals(trainId, dates, guestClaims) {
 export function searchableFields(train) {
   return [train.title, train.recipient, train.description];
 }
+
+// ── the household calendar export ────────────────────────────────────────────
+// A meal train runs every night for weeks, so 120 days is already more nights
+// than any real care period lays out, while keeping a train opened months ahead
+// (a due date, a scheduled surgery) off the calendar until it is near.
+export const CALENDAR_EXPORT_HORIZON_DAYS = 120;
+export const CALENDAR_EXPORT_MAX_EVENTS = 100;
+
+/**
+ * Build the `calendar_events` payload from the nights of the open trains.
+ *
+ * Shape matches what the hub's cross-app aggregation consumes — see
+ * `normalizeExportedEvent` in packages/hub/src/cloudflare/calendar-feed.ts.
+ * Every night is all-day: `dates` carries `meal_date` and no time column, and
+ * the hub derives `allDay` from the absence of a `T` in `start` anyway, so a
+ * date-only row degrades on its own.
+ *
+ * `note`, `covered_dish`, `dietary_notes`, `delivery_notes` and `recipient` are
+ * deliberately NOT exported. This payload is scope-wide and reaches the
+ * household's ICS feed, which external calendar services fetch — and every one
+ * of those fields is free text about a family going through a new baby, a
+ * surgery, or a loss. `delivery_notes` would be the natural `location`, but it
+ * is prose ("cooler on the porch, don't ring the bell, the baby naps at 5"),
+ * not an address, so location stays empty rather than smuggling the note out
+ * under a different key.
+ *
+ * The horizon is stepped from `todayIso` — the HOUSEHOLD's day — in UTC rather
+ * than from the device clock, for the same reason `datesInRange` does: a bare
+ * `yyyy-mm-dd` has no zone, and parsing one through the local clock moves the
+ * boundary by a day for half the world.
+ */
+export function buildCalendarEvents(trains, dates, todayIso) {
+  if (typeof todayIso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(todayIso)) return [];
+  const cursor = new Date(`${todayIso}T00:00:00Z`);
+  cursor.setUTCDate(cursor.getUTCDate() + CALENDAR_EXPORT_HORIZON_DAYS);
+  const horizon = cursor.toISOString().slice(0, 10);
+
+  // Both tables are `adult_writable`, so every member of the scope already
+  // reads these rows — which is the bar for exporting them at all.
+  const openTrains = new Set(trains.filter(t => t.status === "open").map(t => t.id));
+
+  return dates
+    .filter(d => openTrains.has(d.train_id))
+    // A closed night is one the organizer took off the list; it needs no meal
+    // and belongs on nobody's calendar. A 'covered' one stays: knowing dinner
+    // is handled tonight, and by whom, is exactly what the entry is for.
+    .filter(d => d.status !== "closed")
+    .filter(d => d.meal_date >= todayIso && d.meal_date <= horizon)
+    .map(d => ({
+      id: d.id,
+      // Denormalized onto the night by updateTrain, so this needs no join and
+      // cannot name a train under a title it no longer has.
+      title: d.train_title,
+      description: d.status === "covered" ? "Covered" : "Open",
+      location: "",
+      start: d.meal_date,
+      end: d.meal_date,
+      all_day: true,
+      // `covered_by` is nullable on purpose: member_references clears it when
+      // that person leaves the household, so an orphaned night must read as
+      // concerning nobody rather than as `[null]`.
+      member_ids: d.covered_by ? [d.covered_by] : [],
+      source_label: "Meal Train",
+    }))
+    .sort((a, b) => String(a.start).localeCompare(String(b.start)))
+    .slice(0, CALENDAR_EXPORT_MAX_EVENTS);
+}
