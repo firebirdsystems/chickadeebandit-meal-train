@@ -1,5 +1,7 @@
 # Meal Train
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/meal-train) app.
+
 Meals for a family going through something — a new baby, a surgery, a loss.
 
 The people who sign up for a meal train are mostly **not** in the household: they
