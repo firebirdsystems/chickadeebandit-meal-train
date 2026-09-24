@@ -155,7 +155,7 @@
       "params": {
         "title": { "type": "text", "label": "Train title", "required": true },
         "recipient": { "type": "text", "label": "Who it's for", "default": "" },
-        "start_date": { "type": "text", "label": "Starts (yyyy-mm-dd)", "default": "" },
+        "start_date": { "type": "text", "format": "date", "label": "Starts (yyyy-mm-dd)", "default": "" },
         "description": { "type": "text", "label": "About", "default": "" }
       },
       "dedupe": { "table": "trains", "column": "source_event_id" },
