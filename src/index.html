@@ -979,10 +979,10 @@ async function openShareModal(trainId) {
     ? `<div class="warn-box" data-testid="share-no-dates">No nights are open right now, so nobody can sign up through the link. Add a night, or reopen one, first.</div>`
     : "";
 
-  // Premium (`sharing`) controls: a writable link, a password, a long expiry. A
-  // read-only link still shows the train and who has signed up; collecting
-  // sign-ups is the premium half.
-  const premiumControls = _shareEntitled ? `
+  // `sharing` controls: a writable link, a password, a long expiry. A read-only
+  // link still shows the train and who has signed up; collecting sign-ups
+  // needs the capability.
+  const sharingControls = _shareEntitled ? `
     <label class="share-opt">
       <input type="checkbox" id="share-writable" data-testid="share-writable" /> Let people claim a night through the link
     </label>
@@ -996,7 +996,7 @@ async function openShareModal(trainId) {
     </p>
     ${warning}
     ${rows || `<p class="muted tiny" style="padding:8px 0">No active links yet.</p>`}
-    ${premiumControls}
+    ${sharingControls}
     <div class="share-create">
       <select id="share-expiry">
         ${SHARE_EXPIRY_CHOICES.map(({ hours, label }) =>
