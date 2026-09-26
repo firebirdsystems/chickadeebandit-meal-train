@@ -195,6 +195,7 @@
     }
   ],
 
+  "alert_on": ["meal_train.meal_offered"],
   "publishes": [
     "meal_train.train_opened",
     "meal_train.date_covered"
