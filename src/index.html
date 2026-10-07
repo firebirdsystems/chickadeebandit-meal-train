@@ -130,7 +130,7 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph } from "/hub-sdk.js";
 import {
   canManage as _canManage, resolveCurrentMember, dateLabel, datesInRange, normalizeTimestamp,
   guestClaimsForDate, isDateGuestFull, acceptsLinkSignups, parseCapacity,
@@ -852,7 +852,7 @@ function renderDetail() {
         <div class="tools">
           <span class="pill ${t.complete ? "good" : "info"}" data-testid="train-progress">${t.handled}/${t.total} covered</span>
           ${closed ? `<span class="pill" data-testid="train-closed">Closed</span>` : ""}
-          ${share.enabled && canManage() && !closed ? `<button class="btn btn-ghost btn-sm" data-testid="train-share" data-share="${esc(train.id)}">🔗 Share</button>` : ""}
+          ${share.enabled && canManage() && !closed ? `<button class="btn btn-ghost btn-sm" data-testid="train-share" data-share="${esc(train.id)}">${glyph("link")} Share</button>` : ""}
           ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="train-edit" data-edit="${esc(train.id)}">Edit</button>` : ""}
           ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="train-status" data-set-status="${esc(train.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
           ${canManage() ? `<button class="btn btn-quiet-danger" data-testid="train-delete" data-delete-train="${esc(train.id)}">Delete</button>` : ""}
@@ -961,8 +961,8 @@ async function openShareModal(trainId) {
         <input class="share-url" readonly value="${esc(l.url)}" onclick="this.select()" />
         <div class="muted tiny" style="margin-top:3px">
           Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${
-            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ✍️ collects sign-ups` : ""}${
-            l.hasPassword ? " · 🔒 password" : ""}
+            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ${glyph("pencil")} collects sign-ups` : ""}${
+            l.hasPassword ? ` · ${glyph("lock")} password` : ""}
         </div>
       </div>
       <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
