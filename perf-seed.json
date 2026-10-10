@@ -1,0 +1,1676 @@
+{
+  "seed": [
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, dietary_notes, delivery_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days'), ?, ?)",
+      "params": [
+        "perf-train-alvarez",
+        "Meals for the Alvarez family",
+        "Dana & Miguel",
+        "New baby arrived last week. Dinners for four would be a huge help.",
+        "{{date:-12}}",
+        "{{date:16}}",
+        "open",
+        "{{me}}",
+        "Perf Admin",
+        "No dairy, no nuts",
+        "Cooler on the porch, please don't ring the bell."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-1 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-15 days','-1 hours'))",
+      "params": [
+        "perf-date-001",
+        "perf-train-alvarez",
+        "{{date:-12}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{partner}}",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-2 minutes'), ?)",
+      "params": [
+        "perf-date-002",
+        "perf-train-alvarez",
+        "{{date:-11}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-3 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-13 days','-3 hours'))",
+      "params": [
+        "perf-date-003",
+        "perf-train-alvarez",
+        "{{date:-10}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Freezer meal welcome",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-4 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','-4 hours'))",
+      "params": [
+        "perf-date-004",
+        "perf-train-alvarez",
+        "{{date:-9}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "{{me}}",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-5 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-5 hours'))",
+      "params": [
+        "perf-date-005",
+        "perf-train-alvarez",
+        "{{date:-8}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Chili and cornbread"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-6 minutes'))",
+      "params": [
+        "perf-date-006",
+        "perf-train-alvarez",
+        "{{date:-7}}",
+        "Meals for the Alvarez family",
+        2,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-7 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-7 hours'))",
+      "params": [
+        "perf-date-007",
+        "perf-train-alvarez",
+        "{{date:-6}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Dinner for four, they eat at six",
+        "{{partner}}",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-8 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','-8 hours'))",
+      "params": [
+        "perf-date-008",
+        "perf-train-alvarez",
+        "{{date:-5}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{adult2}}",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-9 minutes'), ?)",
+      "params": [
+        "perf-date-009",
+        "perf-train-alvarez",
+        "{{date:-4}}",
+        "Meals for the Alvarez family",
+        1,
+        "closed",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-10 minutes'), ?)",
+      "params": [
+        "perf-date-010",
+        "perf-train-alvarez",
+        "{{date:-3}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-11 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','-11 hours'))",
+      "params": [
+        "perf-date-011",
+        "perf-train-alvarez",
+        "{{date:-2}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-12 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days'))",
+      "params": [
+        "perf-date-012",
+        "perf-train-alvarez",
+        "{{date:-1}}",
+        "Meals for the Alvarez family",
+        2,
+        "covered",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-13 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-1 hours'))",
+      "params": [
+        "perf-date-013",
+        "perf-train-alvarez",
+        "{{date:0}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "{{partner}}",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-14 minutes'), ?)",
+      "params": [
+        "perf-date-014",
+        "perf-train-alvarez",
+        "{{date:1}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-15 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-3 hours'))",
+      "params": [
+        "perf-date-015",
+        "perf-train-alvarez",
+        "{{date:2}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-16 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-4 hours'))",
+      "params": [
+        "perf-date-016",
+        "perf-train-alvarez",
+        "{{date:3}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Smaller portion is fine",
+        "{{me}}",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-17 minutes'), ?)",
+      "params": [
+        "perf-date-017",
+        "perf-train-alvarez",
+        "{{date:4}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-18 minutes'))",
+      "params": [
+        "perf-date-018",
+        "perf-train-alvarez",
+        "{{date:5}}",
+        "Meals for the Alvarez family",
+        2,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-19 minutes'))",
+      "params": [
+        "perf-date-019",
+        "perf-train-alvarez",
+        "{{date:6}}",
+        "Meals for the Alvarez family",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-20 minutes'))",
+      "params": [
+        "perf-date-020",
+        "perf-train-alvarez",
+        "{{date:7}}",
+        "Meals for the Alvarez family",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-21 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-9 hours'))",
+      "params": [
+        "perf-date-021",
+        "perf-train-alvarez",
+        "{{date:8}}",
+        "Meals for the Alvarez family",
+        1,
+        "covered",
+        "Dinner for four, they eat at six",
+        "{{partner}}",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-22 minutes'), ?)",
+      "params": [
+        "perf-date-022",
+        "perf-train-alvarez",
+        "{{date:9}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-23 minutes'), ?)",
+      "params": [
+        "perf-date-023",
+        "perf-train-alvarez",
+        "{{date:10}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-24 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days'))",
+      "params": [
+        "perf-date-024",
+        "perf-train-alvarez",
+        "{{date:11}}",
+        "Meals for the Alvarez family",
+        2,
+        "covered",
+        "Freezer meal welcome",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-25 minutes'))",
+      "params": [
+        "perf-date-025",
+        "perf-train-alvarez",
+        "{{date:12}}",
+        "Meals for the Alvarez family",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-26 minutes'))",
+      "params": [
+        "perf-date-026",
+        "perf-train-alvarez",
+        "{{date:13}}",
+        "Meals for the Alvarez family",
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-27 minutes'))",
+      "params": [
+        "perf-date-027",
+        "perf-train-alvarez",
+        "{{date:14}}",
+        "Meals for the Alvarez family",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-28 minutes'), ?)",
+      "params": [
+        "perf-date-028",
+        "perf-train-alvarez",
+        "{{date:15}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-29 minutes'), ?)",
+      "params": [
+        "perf-date-029",
+        "perf-train-alvarez",
+        "{{date:16}}",
+        "Meals for the Alvarez family",
+        1,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, dietary_notes, delivery_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours'), ?, ?)",
+      "params": [
+        "perf-train-okafor",
+        "Dinners for Marta",
+        "Marta Okafor",
+        "Recovering from knee surgery, on her own for a few weeks.",
+        "{{date:-6}}",
+        "{{date:24}}",
+        "open",
+        "{{partner}}",
+        "Jordan Lee",
+        "Vegetarian",
+        "Side door is unlocked, leave it on the counter."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-30 minutes'), ?)",
+      "params": [
+        "perf-date-030",
+        "perf-train-okafor",
+        "{{date:-6}}",
+        "Dinners for Marta",
+        2,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-31 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days','-7 hours'))",
+      "params": [
+        "perf-date-031",
+        "perf-train-okafor",
+        "{{date:-4}}",
+        "Dinners for Marta",
+        1,
+        "covered",
+        "Freezer meal welcome",
+        "{{partner}}",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-32 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','-8 hours'))",
+      "params": [
+        "perf-date-032",
+        "perf-train-okafor",
+        "{{date:-2}}",
+        "Dinners for Marta",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-33 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-9 hours'))",
+      "params": [
+        "perf-date-033",
+        "perf-train-okafor",
+        "{{date:0}}",
+        "Dinners for Marta",
+        1,
+        "covered",
+        "{{partner}}",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-34 minutes'))",
+      "params": [
+        "perf-date-034",
+        "perf-train-okafor",
+        "{{date:2}}",
+        "Dinners for Marta",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-35 minutes'), ?)",
+      "params": [
+        "perf-date-035",
+        "perf-train-okafor",
+        "{{date:4}}",
+        "Dinners for Marta",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-36 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days'))",
+      "params": [
+        "perf-date-036",
+        "perf-train-okafor",
+        "{{date:6}}",
+        "Dinners for Marta",
+        2,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-37 minutes'), ?)",
+      "params": [
+        "perf-date-037",
+        "perf-train-okafor",
+        "{{date:8}}",
+        "Dinners for Marta",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-38 minutes'), ?)",
+      "params": [
+        "perf-date-038",
+        "perf-train-okafor",
+        "{{date:10}}",
+        "Dinners for Marta",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-39 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-3 hours'))",
+      "params": [
+        "perf-date-039",
+        "perf-train-okafor",
+        "{{date:12}}",
+        "Dinners for Marta",
+        1,
+        "covered",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-40 minutes'))",
+      "params": [
+        "perf-date-040",
+        "perf-train-okafor",
+        "{{date:14}}",
+        "Dinners for Marta",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-41 minutes'))",
+      "params": [
+        "perf-date-041",
+        "perf-train-okafor",
+        "{{date:16}}",
+        "Dinners for Marta",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-42 minutes'), ?)",
+      "params": [
+        "perf-date-042",
+        "perf-train-okafor",
+        "{{date:18}}",
+        "Dinners for Marta",
+        2,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-43 minutes'), ?)",
+      "params": [
+        "perf-date-043",
+        "perf-train-okafor",
+        "{{date:20}}",
+        "Dinners for Marta",
+        1,
+        "closed",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-44 minutes'), ?)",
+      "params": [
+        "perf-date-044",
+        "perf-train-okafor",
+        "{{date:22}}",
+        "Dinners for Marta",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-1 hours','-45 minutes'), ?)",
+      "params": [
+        "perf-date-045",
+        "perf-train-okafor",
+        "{{date:24}}",
+        "Dinners for Marta",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, delivery_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours'), ?)",
+      "params": [
+        "perf-train-chen",
+        "Chen family support",
+        "The Chens",
+        "Grandpa is in hospital, the family is back and forth every evening.",
+        "{{date:-2}}",
+        "{{date:19}}",
+        "open",
+        "{{me}}",
+        "Perf Admin",
+        "Drop off before five, someone is home until then."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-46 minutes'))",
+      "params": [
+        "perf-date-046",
+        "perf-train-chen",
+        "{{date:-2}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-47 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','-11 hours'))",
+      "params": [
+        "perf-date-047",
+        "perf-train-chen",
+        "{{date:-1}}",
+        "Chen family support",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-48 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days'))",
+      "params": [
+        "perf-date-048",
+        "perf-train-chen",
+        "{{date:0}}",
+        "Chen family support",
+        2,
+        "covered",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-49 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-1 hours'))",
+      "params": [
+        "perf-date-049",
+        "perf-train-chen",
+        "{{date:1}}",
+        "Chen family support",
+        1,
+        "covered",
+        "Dinner for four, they eat at six",
+        "{{partner}}",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours'), ?)",
+      "params": [
+        "perf-date-050",
+        "perf-train-chen",
+        "{{date:2}}",
+        "Chen family support",
+        1,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-1 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-3 hours'))",
+      "params": [
+        "perf-date-051",
+        "perf-train-chen",
+        "{{date:3}}",
+        "Chen family support",
+        1,
+        "covered",
+        "Smaller portion is fine",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-2 minutes'), ?)",
+      "params": [
+        "perf-date-052",
+        "perf-train-chen",
+        "{{date:4}}",
+        "Chen family support",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-3 minutes'))",
+      "params": [
+        "perf-date-053",
+        "perf-train-chen",
+        "{{date:5}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-4 minutes'))",
+      "params": [
+        "perf-date-054",
+        "perf-train-chen",
+        "{{date:6}}",
+        "Chen family support",
+        2,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-5 minutes'))",
+      "params": [
+        "perf-date-055",
+        "perf-train-chen",
+        "{{date:7}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-6 minutes'), ?)",
+      "params": [
+        "perf-date-056",
+        "perf-train-chen",
+        "{{date:8}}",
+        "Chen family support",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-7 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-9 hours'))",
+      "params": [
+        "perf-date-057",
+        "perf-train-chen",
+        "{{date:9}}",
+        "Chen family support",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{partner}}",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-8 minutes'), ?)",
+      "params": [
+        "perf-date-058",
+        "perf-train-chen",
+        "{{date:10}}",
+        "Chen family support",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-9 minutes'), ?)",
+      "params": [
+        "perf-date-059",
+        "perf-train-chen",
+        "{{date:11}}",
+        "Chen family support",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-10 minutes'))",
+      "params": [
+        "perf-date-060",
+        "perf-train-chen",
+        "{{date:12}}",
+        "Chen family support",
+        2,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-11 minutes'))",
+      "params": [
+        "perf-date-061",
+        "perf-train-chen",
+        "{{date:13}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-12 minutes'))",
+      "params": [
+        "perf-date-062",
+        "perf-train-chen",
+        "{{date:14}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-13 minutes'), ?)",
+      "params": [
+        "perf-date-063",
+        "perf-train-chen",
+        "{{date:15}}",
+        "Chen family support",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-14 minutes'), ?)",
+      "params": [
+        "perf-date-064",
+        "perf-train-chen",
+        "{{date:16}}",
+        "Chen family support",
+        1,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-15 minutes'), ?)",
+      "params": [
+        "perf-date-065",
+        "perf-train-chen",
+        "{{date:17}}",
+        "Chen family support",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-16 minutes'), ?)",
+      "params": [
+        "perf-date-066",
+        "perf-train-chen",
+        "{{date:18}}",
+        "Chen family support",
+        2,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-2 hours','-17 minutes'))",
+      "params": [
+        "perf-date-067",
+        "perf-train-chen",
+        "{{date:19}}",
+        "Chen family support",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, dietary_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours'), ?)",
+      "params": [
+        "perf-train-bennett",
+        "Welcome home, Coach Bennett",
+        "Coach Bennett",
+        "Home from a long stay away. A few easy dinners to get settled.",
+        "{{date:3}}",
+        "{{date:15}}",
+        "open",
+        "{{adult2}}",
+        "Sam Rivera",
+        "Low salt"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-18 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-8 hours'))",
+      "params": [
+        "perf-date-068",
+        "perf-train-bennett",
+        "{{date:3}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-19 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-9 hours'))",
+      "params": [
+        "perf-date-069",
+        "perf-train-bennett",
+        "{{date:5}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "covered",
+        "{{partner}}",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-20 minutes'), ?)",
+      "params": [
+        "perf-date-070",
+        "perf-train-bennett",
+        "{{date:7}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-21 minutes'), ?)",
+      "params": [
+        "perf-date-071",
+        "perf-train-bennett",
+        "{{date:9}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-22 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days'))",
+      "params": [
+        "perf-date-072",
+        "perf-train-bennett",
+        "{{date:11}}",
+        "Welcome home, Coach Bennett",
+        2,
+        "covered",
+        "Smaller portion is fine",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-23 minutes'), ?)",
+      "params": [
+        "perf-date-073",
+        "perf-train-bennett",
+        "{{date:13}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','-3 hours','-24 minutes'))",
+      "params": [
+        "perf-date-074",
+        "perf-train-bennett",
+        "{{date:15}}",
+        "Welcome home, Coach Bennett",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, dietary_notes, delivery_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours'), ?, ?)",
+      "params": [
+        "perf-train-patel",
+        "Meals for the Patels",
+        "Priya & Arun",
+        "Twins due any day. Starting the list early.",
+        "{{date:9}}",
+        "{{date:30}}",
+        "open",
+        "{{me}}",
+        "Perf Admin",
+        "No beef",
+        "Text when you are five minutes out."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-25 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','-3 hours'))",
+      "params": [
+        "perf-date-075",
+        "perf-train-patel",
+        "{{date:9}}",
+        "Meals for the Patels",
+        1,
+        "covered",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-26 minutes'))",
+      "params": [
+        "perf-date-076",
+        "perf-train-patel",
+        "{{date:12}}",
+        "Meals for the Patels",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-27 minutes'), ?)",
+      "params": [
+        "perf-date-077",
+        "perf-train-patel",
+        "{{date:15}}",
+        "Meals for the Patels",
+        1,
+        "closed",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-28 minutes'), ?)",
+      "params": [
+        "perf-date-078",
+        "perf-train-patel",
+        "{{date:18}}",
+        "Meals for the Patels",
+        2,
+        "open",
+        "Kids are picky, plain pasta is safe"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-29 minutes'), ?)",
+      "params": [
+        "perf-date-079",
+        "perf-train-patel",
+        "{{date:21}}",
+        "Meals for the Patels",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-30 minutes'), ?)",
+      "params": [
+        "perf-date-080",
+        "perf-train-patel",
+        "{{date:24}}",
+        "Meals for the Patels",
+        1,
+        "open",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-31 minutes'))",
+      "params": [
+        "perf-date-081",
+        "perf-train-patel",
+        "{{date:27}}",
+        "Meals for the Patels",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-4 hours','-32 minutes'))",
+      "params": [
+        "perf-date-082",
+        "perf-train-patel",
+        "{{date:30}}",
+        "Meals for the Patels",
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at, delivery_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours'), ?)",
+      "params": [
+        "perf-train-romero",
+        "Soup for Ellis",
+        "Ellis Romero",
+        "Down with the flu.",
+        "{{date:-40}}",
+        "{{date:-31}}",
+        "closed",
+        "{{partner}}",
+        "Jordan Lee",
+        "Porch."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-33 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-43 days','-11 hours'))",
+      "params": [
+        "perf-date-083",
+        "perf-train-romero",
+        "{{date:-40}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-34 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days'))",
+      "params": [
+        "perf-date-084",
+        "perf-train-romero",
+        "{{date:-39}}",
+        "Soup for Ellis",
+        2,
+        "covered",
+        "Dinner for four, they eat at six",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-35 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-41 days','-1 hours'))",
+      "params": [
+        "perf-date-085",
+        "perf-train-romero",
+        "{{date:-38}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{partner}}",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-36 minutes'), ?)",
+      "params": [
+        "perf-date-086",
+        "perf-train-romero",
+        "{{date:-37}}",
+        "Soup for Ellis",
+        1,
+        "open",
+        "Smaller portion is fine"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-37 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-39 days','-3 hours'))",
+      "params": [
+        "perf-date-087",
+        "perf-train-romero",
+        "{{date:-36}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "Freezer meal welcome",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-38 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','-4 hours'))",
+      "params": [
+        "perf-date-088",
+        "perf-train-romero",
+        "{{date:-35}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "{{me}}",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-39 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-37 days','-5 hours'))",
+      "params": [
+        "perf-date-089",
+        "perf-train-romero",
+        "{{date:-34}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Chili and cornbread"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-40 minutes'))",
+      "params": [
+        "perf-date-090",
+        "perf-train-romero",
+        "{{date:-33}}",
+        "Soup for Ellis",
+        2,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-41 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-35 days','-7 hours'))",
+      "params": [
+        "perf-date-091",
+        "perf-train-romero",
+        "{{date:-32}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "Dinner for four, they eat at six",
+        "{{partner}}",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','-5 hours','-42 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','-8 hours'))",
+      "params": [
+        "perf-date-092",
+        "perf-train-romero",
+        "{{date:-31}}",
+        "Soup for Ellis",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{adult2}}",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__trains (id, title, recipient, description, start_date, end_date, status, created_by, created_by_name, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours'))",
+      "params": [
+        "perf-train-whitfield",
+        "Whitfield move-in week",
+        "Dana Whitfield",
+        "Kitchen was not unpacked yet.",
+        "{{date:-75}}",
+        "{{date:-69}}",
+        "closed",
+        "{{me}}",
+        "Perf Admin"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-43 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-78 days','-9 hours'))",
+      "params": [
+        "perf-date-093",
+        "perf-train-whitfield",
+        "{{date:-75}}",
+        "Whitfield move-in week",
+        1,
+        "covered",
+        "Smaller portion is fine",
+        "{{partner}}",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-44 minutes'), ?)",
+      "params": [
+        "perf-date-094",
+        "perf-train-whitfield",
+        "{{date:-74}}",
+        "Whitfield move-in week",
+        1,
+        "closed",
+        "Freezer meal welcome"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-45 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-76 days','-11 hours'))",
+      "params": [
+        "perf-date-095",
+        "perf-train-whitfield",
+        "{{date:-73}}",
+        "Whitfield move-in week",
+        1,
+        "covered",
+        "{{adult2}}",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-46 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-75 days'))",
+      "params": [
+        "perf-date-096",
+        "perf-train-whitfield",
+        "{{date:-72}}",
+        "Whitfield move-in week",
+        2,
+        "covered",
+        "{{me}}",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-47 minutes'), ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-74 days','-1 hours'))",
+      "params": [
+        "perf-date-097",
+        "perf-train-whitfield",
+        "{{date:-71}}",
+        "Whitfield move-in week",
+        1,
+        "covered",
+        "{{partner}}",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-48 minutes'), ?)",
+      "params": [
+        "perf-date-098",
+        "perf-train-whitfield",
+        "{{date:-70}}",
+        "Whitfield move-in week",
+        1,
+        "open",
+        "Dinner for four, they eat at six"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__dates (id, train_id, meal_date, train_title, capacity, status, created_at, note, covered_by, covered_dish, covered_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-79 days','-6 hours','-49 minutes'), ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-72 days','-3 hours'))",
+      "params": [
+        "perf-date-099",
+        "perf-train-whitfield",
+        "{{date:-69}}",
+        "Whitfield move-in week",
+        1,
+        "covered",
+        "Kids are picky, plain pasta is safe",
+        "{{partner}}",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-13 days','-1 hours','-1 minutes'), ?)",
+      "params": [
+        "perf-guest-001",
+        "perf-train-alvarez",
+        "perf-date-002",
+        "Priya Nair",
+        "Stir fry with tofu",
+        "Will drop off around 5:30"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-9 days','-2 hours','-2 minutes'))",
+      "params": [
+        "perf-guest-002",
+        "perf-train-alvarez",
+        "perf-date-006",
+        "Maya Chen",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-9 days','-3 hours','-3 minutes'))",
+      "params": [
+        "perf-guest-003",
+        "perf-train-alvarez",
+        "perf-date-006",
+        "Ellis Romero",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-5 days','-4 hours','-4 minutes'))",
+      "params": [
+        "perf-guest-004",
+        "perf-train-alvarez",
+        "perf-date-010",
+        "Aunt Vera",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-5 hours','-5 minutes'), ?)",
+      "params": [
+        "perf-guest-005",
+        "perf-train-alvarez",
+        "perf-date-014",
+        "The Okafors",
+        "Lentil soup and bread",
+        "Contains gluten"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-6 hours','-6 minutes'))",
+      "params": [
+        "perf-guest-006",
+        "perf-train-alvarez",
+        "perf-date-017",
+        "Grandma Lee",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-7 hours','-7 minutes'))",
+      "params": [
+        "perf-guest-007",
+        "perf-train-alvarez",
+        "perf-date-018",
+        "Noah Lindqvist",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-8 hours','-8 minutes'))",
+      "params": [
+        "perf-guest-008",
+        "perf-train-alvarez",
+        "perf-date-018",
+        "Coach Bennett",
+        "Chili and cornbread"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-9 hours','-9 minutes'), ?)",
+      "params": [
+        "perf-guest-009",
+        "perf-train-alvarez",
+        "perf-date-019",
+        "Uncle Marco",
+        "Mac and cheese with salad",
+        "Disposable dish, no need to return it"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-10 hours','-10 minutes'))",
+      "params": [
+        "perf-guest-010",
+        "perf-train-alvarez",
+        "perf-date-020",
+        "Marta Okafor",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-11 hours','-11 minutes'))",
+      "params": [
+        "perf-guest-011",
+        "perf-train-alvarez",
+        "perf-date-025",
+        "Priya Nair",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-8 days','-12 hours','-12 minutes'))",
+      "params": [
+        "perf-guest-012",
+        "perf-train-okafor",
+        "perf-date-030",
+        "Maya Chen",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-8 days','-13 hours','-13 minutes'), ?)",
+      "params": [
+        "perf-guest-013",
+        "perf-train-okafor",
+        "perf-date-030",
+        "Ellis Romero",
+        "Stir fry with tofu",
+        "Can swap nights if needed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-14 hours','-14 minutes'))",
+      "params": [
+        "perf-guest-014",
+        "perf-train-okafor",
+        "perf-date-034",
+        "Aunt Vera",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-15 hours','-15 minutes'))",
+      "params": [
+        "perf-guest-015",
+        "perf-train-okafor",
+        "perf-date-035",
+        "The Okafors",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-16 hours','-16 minutes'))",
+      "params": [
+        "perf-guest-016",
+        "perf-train-okafor",
+        "perf-date-037",
+        "Grandma Lee",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-17 hours','-17 minutes'), ?)",
+      "params": [
+        "perf-guest-017",
+        "perf-train-okafor",
+        "perf-date-040",
+        "Noah Lindqvist",
+        "Lentil soup and bread",
+        "Will drop off around 5:30"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-18 hours','-18 minutes'))",
+      "params": [
+        "perf-guest-018",
+        "perf-train-okafor",
+        "perf-date-045",
+        "Coach Bennett",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-4 days','-19 hours','-19 minutes'))",
+      "params": [
+        "perf-guest-019",
+        "perf-train-chen",
+        "perf-date-046",
+        "Uncle Marco",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-20 minutes'))",
+      "params": [
+        "perf-guest-020",
+        "perf-train-chen",
+        "perf-date-050",
+        "Marta Okafor",
+        "Chili and cornbread"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-1 hours','-21 minutes'), ?)",
+      "params": [
+        "perf-guest-021",
+        "perf-train-chen",
+        "perf-date-052",
+        "Priya Nair",
+        "Mac and cheese with salad",
+        "Contains gluten"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-2 hours','-22 minutes'))",
+      "params": [
+        "perf-guest-022",
+        "perf-train-chen",
+        "perf-date-053",
+        "Maya Chen",
+        "Tacos, build your own"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-3 hours','-23 minutes'))",
+      "params": [
+        "perf-guest-023",
+        "perf-train-chen",
+        "perf-date-054",
+        "Ellis Romero",
+        "Minestrone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-4 hours','-24 minutes'))",
+      "params": [
+        "perf-guest-024",
+        "perf-train-chen",
+        "perf-date-054",
+        "Aunt Vera",
+        "Vegetable lasagna"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-5 hours','-25 minutes'), ?)",
+      "params": [
+        "perf-guest-025",
+        "perf-train-chen",
+        "perf-date-055",
+        "The Okafors",
+        "Stir fry with tofu",
+        "Disposable dish, no need to return it"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-6 hours','-26 minutes'))",
+      "params": [
+        "perf-guest-026",
+        "perf-train-chen",
+        "perf-date-056",
+        "Grandma Lee",
+        "Curry and naan"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-7 hours','-27 minutes'))",
+      "params": [
+        "perf-guest-027",
+        "perf-train-chen",
+        "perf-date-065",
+        "Noah Lindqvist",
+        "Baked ziti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-8 hours','-28 minutes'))",
+      "params": [
+        "perf-guest-028",
+        "perf-train-bennett",
+        "perf-date-070",
+        "Coach Bennett",
+        "Enchiladas"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-1 days','-9 hours','-29 minutes'), ?)",
+      "params": [
+        "perf-guest-029",
+        "perf-train-patel",
+        "perf-date-080",
+        "Uncle Marco",
+        "Lentil soup and bread",
+        "Can swap nights if needed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-39 days','-10 hours','-30 minutes'))",
+      "params": [
+        "perf-guest-030",
+        "perf-train-romero",
+        "perf-date-086",
+        "Marta Okafor",
+        "Roast chicken and potatoes"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-35 days','-11 hours','-31 minutes'))",
+      "params": [
+        "perf-guest-031",
+        "perf-train-romero",
+        "perf-date-090",
+        "Priya Nair",
+        "Chicken and rice"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-35 days','-12 hours','-32 minutes'))",
+      "params": [
+        "perf-guest-032",
+        "perf-train-romero",
+        "perf-date-090",
+        "Maya Chen",
+        "Chili and cornbread"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_meal_train__guest_claims (id, train_id, date_id, guest_name, bringing, created_at, guest_note) VALUES (?, ?, ?, ?, ?, datetime('now','-72 days','-13 hours','-33 minutes'), ?)",
+      "params": [
+        "perf-guest-033",
+        "perf-train-whitfield",
+        "perf-date-098",
+        "Ellis Romero",
+        "Mac and cheese with salad",
+        "Will drop off around 5:30"
+      ]
+    }
+  ]
+}

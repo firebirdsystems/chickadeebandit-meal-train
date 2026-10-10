@@ -33,7 +33,10 @@
   "storage": "db",
   "preload": {
     "trains": {"sql": "SELECT * FROM app_meal_train__trains WHERE status = 'open' ORDER BY start_date ASC, created_at ASC"},
-    "dates": {"sql": "SELECT d.* FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' ORDER BY d.meal_date ASC, d.created_at ASC"}
+    "dates": {"sql": "SELECT d.* FROM app_meal_train__dates d JOIN app_meal_train__trains t ON t.id = d.train_id AND t.status = 'open' ORDER BY d.meal_date ASC, d.created_at ASC"},
+    "guest_claims": {
+      "sql": "SELECT * FROM app_meal_train__guest_claims ORDER BY created_at ASC"
+    }
   },
 
   "db_plaintext_columns": [
