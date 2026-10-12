@@ -373,6 +373,24 @@ async function handleDeepLink() {
 function clearMessages() { error = ""; notice = ""; }
 function showError(m) { error = m; notice = ""; render(); }
 function showNotice(m) { notice = m; error = ""; render(); }
+// A refused save is said next to the form it came from, with no re-render:
+// redrawing the page would throw away what was typed.
+function formError(anchor, msg) {
+  if (!anchor?.isConnected) return showError(msg);
+  let line = anchor.previousElementSibling;
+  if (!line?.matches("[data-form-error]")) {
+    line = document.createElement("div");
+    line.className = "error";
+    line.setAttribute("role", "alert");
+    line.setAttribute("data-form-error", "");
+    anchor.before(line);
+  }
+  line.textContent = msg;
+}
+function clearFormError(anchor) {
+  const line = anchor?.previousElementSibling;
+  if (line?.matches("[data-form-error]")) line.remove();
+}
 
 // ── mutations ──
 async function saveTrain(form) {
@@ -392,6 +410,7 @@ async function saveTrain(form) {
 
   const btn = form.querySelector('button[type="submit"]');
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  clearFormError(form.querySelector(".actions"));
 
   try {
     if (editingTrainId) {
@@ -399,9 +418,9 @@ async function saveTrain(form) {
     } else {
       await createTrain(fields, form.fill_range.checked);
     }
-  } catch (e) {
+  } catch {
     if (btn) { btn.disabled = false; btn.textContent = editingTrainId ? "Save changes" : "Open meal train"; }
-    showError(e.message);
+    formError(form.querySelector(".actions"), "Couldn’t save the meal train — try again.");
   }
 }
 
@@ -514,14 +533,22 @@ async function addDate(form) {
   const mealDate = form.meal_date.value;
   if (!mealDate) { form.meal_date.focus(); return; }
   const row = newDateRow(train, mealDate, form.note.value.trim(), form.capacity.value);
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) btn.disabled = true;
+  clearFormError(form);
   try {
     if (DB) await insertDateRow(row);
-    dates = [...dates, row];
-    form.reset();
-    form.capacity.value = "1";
-    await syncCalendar();
-    showNotice(`Added ${row.label}.`);
-  } catch (e) { showError(e.message); }
+  } catch {
+    formError(form, "Couldn’t add that night — try again.");
+    return;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+  dates = [...dates, row];
+  form.reset();
+  form.capacity.value = "1";
+  await syncCalendar();
+  showNotice(`Added ${row.label}.`);
 }
 
 async function removeDate(dateId) {
@@ -547,7 +574,7 @@ async function removeDate(dateId) {
     guestClaims = guestClaims.filter(g => g.date_id !== dateId);
     await syncCalendar();
     showNotice("Night removed.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t remove the night — try again."); }
 }
 
 // A member taking a night. There is deliberately no second claims ledger: one
@@ -584,7 +611,7 @@ async function coverDate(dateId, dish) {
     showNotice(`You've got ${date.label}.`);
     publish("meal_train.date_covered", dateId, { train_id: date.train_id, meal_date: date.meal_date });
     return true;
-  } catch (e) { showError(e.message); return false; }
+  } catch { showError("Couldn’t save your sign-up — try again."); return false; }
 }
 
 async function reopenDate(dateId) {
@@ -600,7 +627,7 @@ async function reopenDate(dateId) {
     if (i !== -1) dates[i] = { ...dates[i], status: "open", covered_by: null, covered_dish: "", covered_at: null };
     await syncCalendar();
     showNotice("Night reopened.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t reopen the night — try again."); }
 }
 
 // `status` and the `covered_*` columns are ONE fact about a night, so this
@@ -635,7 +662,7 @@ async function toggleDateClosed(dateId) {
     if (i !== -1) dates[i] = { ...dates[i], ...fields };
     await syncCalendar();
     render();
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(closing ? "Couldn’t close the night — try again." : "Couldn’t reopen the night — try again."); }
 }
 
 // How many sign-ups this night accepts through the link. The hub enforces it
@@ -655,7 +682,7 @@ async function setCapacity(dateId, raw) {
     const i = dates.findIndex(d => d.id === dateId);
     if (i !== -1) dates[i] = { ...dates[i], capacity: next };
     render();
-  } catch (e) { showError(e.message); render(); }
+  } catch (e) { console.error(e); showError("Couldn’t save the link spots — try again."); }
 }
 
 async function setTrainStatus(trainId, status) {
@@ -674,7 +701,7 @@ async function setTrainStatus(trainId, status) {
     if (i !== -1) trains[i] = { ...trains[i], status };
     await syncCalendar();
     showNotice(status === "closed" ? "Meal train closed." : "Meal train reopened.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(status === "closed" ? "Couldn’t close the meal train — try again." : "Couldn’t reopen the meal train — try again."); }
 }
 
 async function deleteTrain(trainId) {
@@ -701,7 +728,7 @@ async function deleteTrain(trainId) {
     selectedTrainId = null;
     await syncCalendar();
     showNotice("Meal train deleted.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t delete the meal train — try again."); }
 }
 
 // ── render ──
@@ -956,7 +983,11 @@ async function submitCover(dateId) {
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
   const ok = await coverDate(dateId, dish);
   if (ok) closeModal();
-  else if (btn) { btn.disabled = false; btn.textContent = "I've got it"; }
+  else if (btn) {
+    btn.disabled = false; btn.textContent = "I've got it";
+    // The page behind says why; say it in the dialog too, which is still open as typed.
+    if (error) formError(btn.parentElement, error);
+  }
 }
 
 // ── share links ──
