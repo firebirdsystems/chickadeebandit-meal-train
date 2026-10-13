@@ -418,7 +418,8 @@ async function saveTrain(form) {
     } else {
       await createTrain(fields, form.fill_range.checked);
     }
-  } catch {
+  } catch (e) {
+    console.error(e);
     if (btn) { btn.disabled = false; btn.textContent = editingTrainId ? "Save changes" : "Open meal train"; }
     formError(form.querySelector(".actions"), "Couldn’t save the meal train — try again.");
   }
@@ -538,7 +539,8 @@ async function addDate(form) {
   clearFormError(form);
   try {
     if (DB) await insertDateRow(row);
-  } catch {
+  } catch (e) {
+    console.error(e);
     formError(form, "Couldn’t add that night — try again.");
     return;
   } finally {
@@ -611,7 +613,7 @@ async function coverDate(dateId, dish) {
     showNotice(`You've got ${date.label}.`);
     publish("meal_train.date_covered", dateId, { train_id: date.train_id, meal_date: date.meal_date });
     return true;
-  } catch { showError("Couldn’t save your sign-up — try again."); return false; }
+  } catch (e) { console.error(e); showError("Couldn’t save your sign-up — try again."); return false; }
 }
 
 async function reopenDate(dateId) {
@@ -994,10 +996,14 @@ async function submitCover(dateId) {
 let _shareLinks = [];
 let _shareEntitled = false;
 
-async function openShareModal(trainId) {
+async function openShareModal(trainId, { afterWrite = false } = {}) {
   const train = trains.find(t => t.id === trainId);
   if (!train) return;
   const status = await share.listAll();
+  // A refused or failed list read comes back EMPTY, not as an error; `limits`
+  // is on every real answer. After a create or revoke an empty list drawn as
+  // "none" would invite a second create, so that caller hears it failed.
+  if (afterWrite && status.limits === null) throw new Error("Share links could not be re-read");
   _shareLinks = status.links;
   _shareEntitled = status.entitled;
   const active = activeShareLinks(_shareLinks, trainId);
@@ -1064,13 +1070,22 @@ async function createShareLink(trainId) {
   const password = document.getElementById("share-password")?.value?.trim() || undefined;
   const btn = modalEl?.querySelector("[data-share-create]");
   if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+  let link;
   try {
-    const link = await share.create("train", trainId, { expiresInHours: hours, label: train?.title, writable, password });
-    try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
-    await openShareModal(trainId);
+    link = await share.create("train", trainId, { expiresInHours: hours, label: train?.title, writable, password });
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
     hubAlert("Couldn't create share link", { description: err.message });
+    return;
+  }
+  try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
+  // The link exists now. A failed list re-read must not read as a failed
+  // create: a retry would mint a second link.
+  try { await openShareModal(trainId, { afterWrite: true }); }
+  catch (err) {
+    console.error(err);
+    closeModal();
+    hubAlert("Share link created", { description: "Couldn’t refresh the list — open Share again to see it." });
   }
 }
 
@@ -1083,8 +1098,14 @@ async function copyShareLink(id) {
 
 async function revokeShareLink(id, trainId) {
   if (!await hubConfirm({ message: "Revoke this share link?", description: "Anyone using it will immediately lose access.", confirmLabel: "Revoke" })) return;
-  try { await share.revoke(id); await openShareModal(trainId); }
-  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); }
+  try { await share.revoke(id); }
+  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); return; }
+  try { await openShareModal(trainId, { afterWrite: true }); }
+  catch (err) {
+    console.error(err);
+    closeModal();
+    hubAlert("Share link revoked", { description: "Couldn’t refresh the list — open Share again to see it." });
+  }
 }
 
 function render() {
