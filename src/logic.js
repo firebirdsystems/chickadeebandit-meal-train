@@ -289,3 +289,51 @@ export function buildCalendarEvents(trains, dates, todayIso) {
     .sort((a, b) => String(a.start).localeCompare(String(b.start)))
     .slice(0, CALENDAR_EXPORT_MAX_EVENTS);
 }
+
+/**
+ * The line a failed write shows ("Refused, gone, or failed" in the app-template guide):
+ * "try again" only when retrying can work. `thing` and `action` are the app's own nouns
+ * ("connection", "save the connection"). `found` is the caller's re-read after a write that
+ * changed nothing (or a 404/409): false = the row is gone, true = it is there in another
+ * state. A `forUser` error keeps the message the app wrote for it. Never shows hub text.
+ */
+export function failureLine(e, { action, thing, found } = {}) {
+  if (e?.forUser) return e.message;
+  if (e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return `That ${thing} already exists.`;
+  if (e?.status === 403) return `You don’t have permission to ${action}.`;
+  if (e?.status === 507) return "The household’s storage is full — free up space first.";
+  if (found === false || (found === undefined && e?.status === 404)) return `This ${thing} has been removed.`;
+  if (found === true || e?.status === 409 || e?.status === 404) return `This ${thing} was changed by someone else — check it first.`;
+  return `Couldn’t ${action} — try again.`;
+}
+
+/**
+ * "Retry after a lost response" (app-template guide): whether a failed write's answer leaves
+ * its outcome unknown — no status, a 400, or a 5xx other than 507 — so the page must re-read
+ * by its pinned id or stamp before saying anything. A refusal the hub named is known.
+ */
+export function outcomeUnknown(e) {
+  if (e?.forUser || e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return false;
+  const s = e?.status;
+  return s == null || s === 400 || (s >= 500 && s !== 507);
+}
+
+/**
+ * What a guarded write with a pinned id/stamp did, decided from the re-read that follows a
+ * write that changed nothing (`conflict`: `changed: 0` or a batch's 409) or an unknown outcome.
+ *   reread      — the re-read succeeded
+ *   landed      — the re-read finds the row carrying THIS attempt's pinned id/stamp
+ *   found       — the row is still there (undefined: that part of the read is unknown)
+ *   parentFound — the row's container is still loaded (false: it went with it)
+ * Returns "landed" (run the success path once), "failed" (unknown outcome, not found: the
+ * failure line, pin kept), "unknown" (a conflict the re-read could not explain: the plain line,
+ * pin kept), or a refusal — "parent-removed" / "removed" / "changed" (pin forgotten).
+ */
+export function pinnedWriteOutcome({ conflict, reread, landed, found, parentFound = true }) {
+  if (reread && landed) return "landed";
+  if (!conflict) return "failed";
+  if (!reread) return "unknown";
+  if (!parentFound) return "parent-removed";
+  if (found === undefined) return "unknown";
+  return found ? "changed" : "removed";
+}
