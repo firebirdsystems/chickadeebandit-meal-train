@@ -1075,7 +1075,8 @@ async function createShareLink(trainId) {
     link = await share.create("train", trainId, { expiresInHours: hours, label: train?.title, writable, password });
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
-    hubAlert("Couldn't create share link", { description: err.message });
+    console.error(err);
+    hubAlert("Couldn’t create the share link — try again.");
     return;
   }
   try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
@@ -1099,7 +1100,7 @@ async function copyShareLink(id) {
 async function revokeShareLink(id, trainId) {
   if (!await hubConfirm({ message: "Revoke this share link?", description: "Anyone using it will immediately lose access.", confirmLabel: "Revoke" })) return;
   try { await share.revoke(id); }
-  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); return; }
+  catch (err) { console.error(err); hubAlert("Couldn’t revoke the share link — try again."); return; }
   try { await openShareModal(trainId, { afterWrite: true }); }
   catch (err) {
     console.error(err);
