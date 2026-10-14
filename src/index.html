@@ -1094,7 +1094,7 @@ async function copyShareLink(id) {
   const link = _shareLinks.find(l => l.id === id);
   if (!link) return;
   try { await navigator.clipboard.writeText(link.url); }
-  catch { hubAlert("Couldn't copy — select the link text and copy it manually."); }
+  catch { hubAlert("Couldn’t copy — select the link text and copy it manually."); }
 }
 
 async function revokeShareLink(id, trainId) {
@@ -1151,7 +1151,7 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (t.hasAttribute("data-delete-train")) { deleteTrain(t.getAttribute("data-delete-train")); return; }
-  if (t.hasAttribute("data-share")) { openShareModal(t.getAttribute("data-share")).catch(err => hubAlert("Couldn't load share links", { description: err.message })); return; }
+  if (t.hasAttribute("data-share")) { openShareModal(t.getAttribute("data-share")).catch(err => { console.error(err); hubAlert("Couldn’t load the share links — try again."); }); return; }
   if (t.hasAttribute("data-share-create")) { createShareLink(t.getAttribute("data-share-create")); return; }
   if (t.hasAttribute("data-share-copy")) { copyShareLink(t.getAttribute("data-share-copy")); return; }
   if (t.hasAttribute("data-share-revoke")) { revokeShareLink(t.getAttribute("data-share-revoke"), t.getAttribute("data-train-id")); return; }
