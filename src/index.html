@@ -138,7 +138,7 @@ import {
   guestClaimsForDate, isDateGuestFull, acceptsLinkSignups, parseCapacity,
   dateState, isOrphanedCoverage,
   toggledClosedFields, datesForTrain, openDatesForForm, trainTotals as _trainTotals, searchableFields,
-  buildCalendarEvents, failureLine, outcomeUnknown, pinnedWriteOutcome,
+  buildCalendarEvents, failureLine, outcomeUnknown, pinnedWriteOutcome, shareFailureLine,
 } from "./logic.js";
 
 const CONTEXT    = window.__CONTEXT_URL    ?? "";
@@ -1122,9 +1122,10 @@ async function createShareLink(trainId) {
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
     console.error(err);
-    // A refusal says what happened; only a failure (no answer, a 5xx, the hub's 409 catch-all) asks for a retry.
-    hubAlert(err?.status === 402 ? "Links with a password, sign-ups or a longer expiry need an active plan."
-      : failureLine(err?.status === 409 ? undefined : err, { action: "create the share link", thing: "meal train" }));
+    // A refusal says what happened; only a failure (no answer, a 5xx) asks for a retry.
+    hubAlert(err?.status === 402 && (writable || password || hours > 720)
+      ? "Links with a password, sign-ups or a longer expiry need an active plan."
+      : shareFailureLine(err, { action: "create the share link", thing: "meal train" }));
     return;
   }
   try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
@@ -1150,16 +1151,20 @@ async function revokeShareLink(id, trainId) {
   try { await share.revoke(id); }
   catch (err) {
     console.error(err);
-    hubAlert(failureLine(err, { action: "revoke the share link", thing: "share link" }));
-    // A link the hub no longer has: redraw the list so it drops off.
-    if (err?.status === 404) openShareModal(trainId).catch(e2 => console.error(e2));
-    return;
+    // A 404 is a link the hub no longer has: done; the refresh below drops it.
+    if (err?.status !== 404) { hubAlert(shareFailureLine(err, { action: "revoke the share link", thing: "meal train" })); return; }
   }
+  _shareLinks = _shareLinks.filter(l => l.id !== id);
   try { await openShareModal(trainId, { afterWrite: true }); }
   catch (err) {
     console.error(err);
     closeModal();
     hubAlert("Share link revoked", { description: "Couldn’t refresh the list — open Share again to see it." });
+    return;
+  }
+  // The hub's 404 also covers another member's link it would not let this one revoke.
+  if (activeShareLinks(_shareLinks, trainId).some(l => l.id === id)) {
+    hubAlert("You don’t have permission to revoke the share link.");
   }
 }
 
