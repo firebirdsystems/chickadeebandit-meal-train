@@ -351,7 +351,9 @@ async function refresh({ deepLink = false } = {}) {
   } catch (e) {
     // Only a failed FIRST load raises the banner; a failed manual refresh
     // leaves the trains already on screen and says so inline.
-    if (loaded) error = e.message; else loadFailed = true;
+    // The hub's text is never for the screen.
+    console.error("[meal-train] refresh failed:", e);
+    if (loaded) error = "Couldn’t refresh the meal trains — try again."; else loadFailed = true;
     render();
   }
 }
@@ -1191,7 +1193,10 @@ document.addEventListener("click", (event) => {
     render();
     // The closed archive is not loaded up front; pull it the first time that
     // tab is asked for, then redraw with it.
-    if (view === "closed") loadClosed().then(render).catch((e) => { error = e.message; render(); });
+    if (view === "closed") loadClosed().then(render).catch((e) => {
+      console.error("[meal-train] closed archive failed:", e);
+      error = "Couldn’t load the closed meal trains — try again."; render();
+    });
     return;
   }
   if (t.matches("[data-refresh]")) { refresh(); return; }
