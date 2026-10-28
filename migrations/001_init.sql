@@ -10,7 +10,7 @@
 -- The care period. `status` is the public gate: a train that is not `open`
 -- disappears from every share link on it (manifest shareable.train.visible_where).
 CREATE TABLE IF NOT EXISTS app_meal_train__trains (
-  id              TEXT PRIMARY KEY,
+  id              TEXT NOT NULL PRIMARY KEY,
   title           TEXT NOT NULL,                 -- "Meals for the Alvarez family"
   recipient       TEXT NOT NULL DEFAULT '',      -- who is being fed
   description     TEXT NOT NULL DEFAULT '',      -- why, and anything else helpers should know
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS app_meal_train__trains (
 -- `train_title` is the same bargain for the Today agenda and the glance tile,
 -- both of which are single-table SELECTs that cannot join back to `trains`.
 CREATE TABLE IF NOT EXISTS app_meal_train__dates (
-  id           TEXT PRIMARY KEY,
+  id           TEXT NOT NULL PRIMARY KEY,
   train_id     TEXT NOT NULL,
   meal_date    TEXT NOT NULL,                 -- yyyy-mm-dd, plaintext by suffix
   label        TEXT NOT NULL DEFAULT '',      -- denormalized display date
